@@ -4,84 +4,85 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Makda — Portfolio</title>
-  <link rel="stylesheet" href="style.css?v=20260107z3" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- SITE (under) -->
-  <section id="site" class="site" aria-label="Homepage" aria-hidden="true">
-    <header class="site-header">
-      <div id="heroTitle" class="hero-title" aria-live="polite"></div>
-    </header>
-
-    <section class="cards" aria-label="Sections">
-      <a class="card c1" href="work_01.html">
-        <div class="card-title">WORK 01</div>
-        <div class="card-sub">Identity / symbol / control</div>
-        <div class="card-tag">archive node 01</div>
-      </a>
-
-      <a class="card c2" href="work_02.html">
-        <div class="card-title">WORK 02</div>
-        <div class="card-sub">Memory / metadata / signal</div>
-        <div class="card-tag">archive node 02</div>
-      </a>
-
-      <a class="card c3" href="work_03.html">
-        <div class="card-title">WORK 03</div>
-        <div class="card-sub">Speed / power / spectacle</div>
-        <div class="card-tag">archive node 03</div>
-      </a>
-
-      <a class="card c4" href="about.html">
-        <div class="card-title">ABOUT</div>
-        <div class="card-sub">Who I am + what I do</div>
-        <div class="card-tag">bio / contact</div>
-      </a>
-    </section>
-  </section>
-
-  <!-- CURTAIN (top) -->
   <main class="stage" id="stage">
-    <div id="curtain" class="curtain" aria-hidden="false">
-      <canvas id="curtainCanvas" class="curtain-canvas" aria-hidden="true"></canvas>
-      <canvas id="fxCanvas" class="fx" aria-hidden="true"></canvas>
+    <!-- TOP "CURTAIN" CANVAS: bluesplatts + hex grid live here -->
+    <canvas id="curtainCanvas" class="curtain-canvas" aria-hidden="true"></canvas>
+
+    <!-- FX CANVAS (optional pulse/burst) -->
+    <canvas id="fxCanvas" class="fx" aria-hidden="true"></canvas>
+
+    <!-- Crown (only visible object on boot) -->
+    <button id="crownBtn" class="crown-btn" type="button" aria-label="Enter site">
+      <svg id="crownSvg" class="crown" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path id="crownPath"
+    d="M18 64
+       L18 30
+       Q18 26 22 30
+       L44 52
+       Q46 56 49 50
+       L60 10
+       Q62 7 65 12
+       L77 50
+       Q79 56 83 52
+       L102 30
+       Q106 26 102 33
+       L102 64
+       Q70 70 60 70
+       Q40 70 18 64"
+    stroke="#FFF6C1" stroke-width="5"
+    stroke-linecap="round" stroke-linejoin="round"
+  />
+  <path id="basePath"
+    d="M18 64 L102 64"
+    stroke="rgba(255,246,193,0.55)" stroke-width="4"
+    stroke-linecap="round"
+  />
+</svg>
 
 
-      <button id="crownBtn" class="crown-btn" type="button" aria-label="Enter site">
-        <svg id="crownSvg" class="crown" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path id="crownPath"
-            d="M18 64
-               L18 30
-               Q18 26 22 30
-               L44 52
-               Q46 56 49 50
-               L60 10
-               Q62 7 65 12
-               L77 50
-               Q79 56 83 52
-               L102 30
-               Q106 26 102 33
-               L102 64
-               Q70 70 60 70
-               Q40 70 18 64"
-            stroke="#FFF6C1" stroke-width="5"
-            stroke-linecap="round" stroke-linejoin="round"
-          />
-          <path id="basePath"
-            d="M18 64 L102 64"
-            stroke="rgba(255,246,193,0.55)" stroke-width="4"
-            stroke-linecap="round"
-          />
-        </svg>
+      <div class="cta" aria-hidden="true">
+        <div class="cta-top">click the crown</div>
+        <div class="cta-bot">to begin</div>
+      </div>
+    </button>
 
-        <span class="boot-hint" aria-hidden="true">
-          click the crown
-          <span class="boot-hint-sub">to begin</span>
-        </span>
-      </button>
-    </div>
+    <!-- MAIN SITE (UNDER) -->
+    <section id="site" class="site" aria-label="Homepage">
+      <header class="site-header">
+        <div id="heroTitle" class="hero-title" aria-live="polite"></div>
+      </header>
+
+      <section class="cards" aria-label="Sections">
+        <a class="card c1" href="work_01.html">
+          <div class="card-title">WORK 01</div>
+          <div class="card-sub">Identity / symbol / control</div>
+          <div class="card-tag">archive node 01</div>
+        </a>
+
+        <a class="card c2" href="work_02.html">
+          <div class="card-title">WORK 02</div>
+          <div class="card-sub">Memory / metadata / signal</div>
+          <div class="card-tag">archive node 02</div>
+        </a>
+
+        <a class="card c3" href="work_03.html">
+          <div class="card-title">WORK 03</div>
+          <div class="card-sub">Speed / power / spectacle</div>
+          <div class="card-tag">archive node 03</div>
+        </a>
+
+        <a class="card c4" href="about.html">
+          <div class="card-title">ABOUT</div>
+          <div class="card-sub">Who I am + what I do</div>
+          <div class="card-tag">bio / contact</div>
+        </a>
+      </section>
+    </section>
   </main>
 
-  <script src="main.js?v=20260107z3"></script>
+  <script src="main.js"></script>
 </body>
 </html>
