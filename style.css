@@ -144,6 +144,23 @@ body.unlocked .site{
   overflow:hidden;
   position:relative;
 }
+.folder-body::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius: inherit;
+
+  background-image: url("./assets/foldershellbackground.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  opacity: 0.06; /* start LOW */
+  mix-blend-mode: overlay;
+
+  pointer-events:none;
+  z-index: 0;
+}
 
 .panel{ position:absolute; inset:0; }
 
@@ -151,6 +168,10 @@ body.unlocked .site{
   position:relative;
   height:100%;
   padding: 14px; /* tighter */
+}
+.panel,
+.panel-inner{
+  z-index: 1;
 }
 
 /* bottom-left intro bubble */
