@@ -68,39 +68,58 @@
 
         <div class="folder-body">
           <!-- Panel: ABOUT -->
-          <section class="panel is-active" role="tabpanel" aria-labelledby="tab-about" data-panel="about">
-            <div class="panel-inner">
-              <div class="about-intro">
-                <div class="intro-row">
-  <div id="heroTitle" class="intro-line" aria-live="polite"></div>
+<section class="panel is-active" role="tabpanel" aria-labelledby="tab-about" data-panel="about">
+  <div class="panel-inner">
 
-  <svg class="mini-crown" viewBox="0 0 120 80" fill="none" aria-hidden="true">
-    <path
-      d="M18 64
-        L18 30
-        Q18 26 22 30
-        L44 52
-        Q46 56 49 50
-        L60 10
-        Q62 7 65 12
-        L77 50
-        Q79 56 83 52
-        L102 30
-        Q106 26 102 33
-        L102 64
-        Q70 70 60 70
-        Q40 70 18 64"
-      stroke="rgba(233,238,252,0.88)" stroke-width="5"
-      stroke-linecap="round" stroke-linejoin="round"
-    />
-  </svg>
-</div>
+    <!-- Photo reveal (pieces stacked + animated) -->
+    <div class="about-layout" aria-hidden="true">
+      <div class="about-photo" id="aboutPhoto">
+        <!-- IMPORTANT:
+             These pieces should be PNGs with transparency.
+             BEST: export each piece at the SAME canvas size so they line up automatically. -->
 
-                <div class="intro-sub">
-                </div>
-              </div>
+        <img class="shard" src="./assets/me/torso.png" alt="" style="--d: 0ms;">
+        <img class="shard" src="./assets/me/leftshoulder.png" alt="" style="--d: 120ms;">
+        <img class="shard" src="./assets/me/rightarm.png" alt="" style="--d: 240ms;">
+        <img class="shard" src="./assets/me/leftleg.png" alt="" style="--d: 360ms;">
+        <img class="shard" src="./assets/me/head.png" alt="" style="--d: 480ms;">
+      </div>
+    </div>
 
-          </section>
+    <!-- Your existing intro bubble -->
+    <div class="about-intro">
+      <div class="intro-row">
+        <div id="heroTitle" class="intro-line" aria-live="polite"></div>
+
+        <svg class="mini-crown" viewBox="0 0 120 80" fill="none" aria-hidden="true">
+          <path
+            d="M18 64
+              L18 30
+              Q18 26 22 30
+              L44 52
+              Q46 56 49 50
+              L60 10
+              Q62 7 65 12
+              L77 50
+              Q79 56 83 52
+              L102 30
+              Q106 26 102 33
+              L102 64
+              Q70 70 60 70
+              Q40 70 18 64"
+            stroke="rgba(233,238,252,0.88)" stroke-width="5"
+            stroke-linecap="round" stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+
+      <div class="intro-sub">
+      </div>
+    </div>
+
+  </div>
+</section>
+
 
           <!-- Panel: IDENTITY -->
           <section class="panel" role="tabpanel" aria-labelledby="tab-identity" data-panel="identity" hidden>

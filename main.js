@@ -8,6 +8,25 @@ const fxCanvas  = document.getElementById("fxCanvas");
 
 const heroTitle = document.getElementById("heroTitle");
 
+const aboutPhoto = document.getElementById("aboutPhoto");
+
+function playAboutPhoto(){
+  if (!aboutPhoto) return;
+
+  // run once (prevents the "show then reset" vibe)
+  if (aboutPhoto.dataset.revealed === "1") return;
+
+  // wait a frame so CSS hidden state is definitely painted
+  requestAnimationFrame(() => {
+    aboutPhoto.classList.add("is-playing");
+    aboutPhoto.dataset.revealed = "1";
+  });
+}
+
+
+
+
+
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const SCRAMBLE = "!@#$%^&*()_+=-[]{}<>?/\\|~";
 
@@ -346,6 +365,8 @@ function setActiveTab(name){
     if (isOn) p.removeAttribute("hidden");
     else p.setAttribute("hidden", "");
   });
+  if (name === "about") playAboutPhoto();
+
 }
 
 function bindTabs(){
@@ -389,13 +410,27 @@ function init(){
   animateCrownDraw();
 
   bindTabs();
-  setActiveTab("about");
+// don't activate tabs before unlock; just set initial ARIA/class state without triggering animations
+const tabs = document.querySelectorAll(".tab[data-tab]");
+const panels = document.querySelectorAll(".panel[data-panel]");
+tabs.forEach(btn => {
+  const isOn = btn.dataset.tab === "about";
+  btn.classList.toggle("is-active", isOn);
+  btn.setAttribute("aria-selected", isOn ? "true" : "false");
+});
+panels.forEach(p => {
+  const isOn = p.dataset.panel === "about";
+  p.classList.toggle("is-active", isOn);
+  if (isOn) p.removeAttribute("hidden");
+  else p.setAttribute("hidden", "");
+});
 
   if (heroTitle) heroTitle.textContent = "";
 
   document.body.classList.remove("entered","unlocked");
   entered = false;
 }
+
 
 window.addEventListener("DOMContentLoaded", init);
 window.addEventListener("resize", () => {
@@ -410,5 +445,7 @@ crownBtn.addEventListener("click", enter);
 crownBtn.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") enter();
 });
+
+
 
 

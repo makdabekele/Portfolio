@@ -312,4 +312,67 @@ body.unlocked .cta{
   body.entered .crown{ animation:none; transform: translateY(68vh) scale(.42); opacity:.14; }
 }
 
+/* ----------------- ABOUT PHOTO: piece-by-piece reveal ----------------- */
+.about-layout{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+  z-index: 1;
+}
+
+.about-photo{
+  width: clamp(260px, 32vw, 460px);
+  position: relative;
+  filter: drop-shadow(0 22px 55px rgba(0,0,0,.55));
+}
+
+/* Each shard is stacked in the same spot */
+.about-photo .shard{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:auto;
+  display:block;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(.98);
+  filter: blur(10px);
+  will-change: transform, opacity, filter;
+}
+
+.about-photo .shard{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:auto;
+  display:block;
+
+  opacity: 0;
+  visibility: hidden;
+}
+
+.about-photo .shard{
+  opacity:0;
+  visibility:hidden;
+}
+
+.about-photo.is-playing .shard{
+  visibility:visible;
+  animation: shardPop 1ms both;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes shardPop{
+  from{ opacity:0; }
+  to{ opacity:1; }
+}
+
+
+
+
+
+
 
