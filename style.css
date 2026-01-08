@@ -2,77 +2,103 @@
   --bg:#050915;
   --ink: rgba(233,238,252,.88);
   --muted: rgba(233,238,252,.62);
-  --glass: rgba(10,16,32,.45);
   --edge: rgba(120,170,255,.18);
   --neon: rgba(0,255,190,.22);
 }
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
+
 body{
   margin:0;
   background: var(--bg);
   color: var(--ink);
   overflow:hidden;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* base blueprint glow (subtle) */
+  background:
+    radial-gradient(900px 560px at 50% 34%, rgba(120,170,255,.10), transparent 60%),
+    radial-gradient(700px 520px at 56% 68%, rgba(0,255,190,.06), transparent 62%),
+    linear-gradient(180deg, #071020, #05070e);
 }
 
-/* ----------------- SITE (UNDER) ----------------- */
-.site{
+.stage{
+  height:100%;
+  position:relative;
+  display:block;
+}
 
+/* ----------------- UNDER SITE ----------------- */
+.site{
   position:absolute;
   inset:0;
   z-index:1;
-  opacity:0;              /* hidden until click */
-  visibility:hidden;      /* prevent “flash” */
+  opacity:0;
+  visibility:hidden;
   pointer-events:none;
   transition: opacity 220ms linear;
 }
-
-body.revealing .site{
+body.unlocked .site{
   opacity:1;
   visibility:visible;
   pointer-events:auto;
 }
-
-.grid{
+.site-header{
   position:absolute;
-  inset:0;
-  padding: 52px 56px;
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  grid-auto-rows: min-content;
-  gap: 22px;
-  align-content:start;
+  top: 22px;
+  left: 22px;
+  z-index:2;
+}
+.hero-title{
+  position:relative;
+  font-size: clamp(22px, 2.2vw, 34px);
+  letter-spacing: 0.02em;
+  white-space: pre;
+  padding: 10px 14px;
+  border-radius: 22px;
+  background: rgba(5, 8, 16, 0.38);
+  box-shadow:
+    inset 0 0 0 1px rgba(233,238,252,.10),
+    0 18px 60px rgba(0,0,0,.45);
+  text-shadow:
+    1px 0 rgba(255,60,120,.22),
+   -1px 0 rgba(60,220,255,.18),
+    0 0 18px rgba(0,255,190,.08);
+  backdrop-filter: blur(10px);
 }
 
+/* cards */
+.cards{
+  position:absolute;
+  left: 22px;
+  top: clamp(96px, 13vh, 132px);
+  width: min(1120px, calc(100vw - 44px));
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
 .card{
   position:relative;
-  display:block;
-  padding: 26px 26px 44px;
-  border-radius: 22px;
-  background: rgba(10,14,26,.22);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(120,170,255,.12);
-  box-shadow: 0 22px 70px rgba(0,0,0,.42);
   text-decoration:none;
-  color: inherit;
+  color: var(--ink);
+  padding: 22px 22px 18px;
+  border-radius: 22px;
+  min-height: 150px;
   overflow:hidden;
-  transform: translateZ(0);
-}
 
-.card::before{
-  content:"";
-  position:absolute;
-  inset:-2px;
   background:
-    radial-gradient(600px 200px at 18% 18%, rgba(0,255,190,.10), transparent 60%),
-    radial-gradient(500px 240px at 75% 30%, rgba(255,60,120,.10), transparent 62%),
-    radial-gradient(700px 260px at 50% 85%, rgba(255,209,42,.08), transparent 60%);
-  opacity:.9;
-  pointer-events:none;
-}
+    radial-gradient(780px 260px at 18% 0%, rgba(0,255,190,.07), transparent 55%),
+    radial-gradient(640px 260px at 120% 120%, rgba(255,170,40,.08), transparent 55%),
+    rgba(5, 8, 16, 0.40);
 
+  box-shadow:
+    inset 0 0 0 1px rgba(233,238,252,.10),
+    0 18px 44px rgba(0,0,0,.42);
+
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  backdrop-filter: blur(12px);
+}
 .card::after{
   content:"";
   position:absolute;
@@ -83,18 +109,16 @@ body.revealing .site{
     inset 0 0 0 1px rgba(120,170,255,.16),
     inset 1px 0 0 rgba(255,60,120,.10),
     inset -1px 0 0 rgba(0,255,190,.10);
-  opacity:.9;
+  opacity:.85;
 }
-
 .card-title{
   font-size: 26px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   text-shadow:
     1px 0 rgba(255,60,120,.22),
-   -1px 0 rgba(0,255,190,.18);
+   -1px 0 rgba(60,220,255,.18);
 }
-
 .card-title::after{
   content:"";
   display:block;
@@ -107,17 +131,15 @@ body.revealing .site{
     rgba(0,255,190,.35),
     rgba(255,60,120,.0)
   );
-  opacity:.6;
+  opacity:.55;
 }
-
 .card-sub{
   margin-top: 12px;
-  opacity: .86;
+  opacity: .82;
   font-size: 18px;
   line-height: 1.35;
-  color: rgba(233,238,252,.76);
+  color: rgba(233,238,252,.78);
 }
-
 .card-tag{
   position:absolute;
   left: 22px;
@@ -127,95 +149,35 @@ body.revealing .site{
   opacity:.55;
   text-transform: lowercase;
 }
-
 .card:hover{
   transform: translateY(-2px);
   box-shadow:
     inset 0 0 0 1px rgba(0,255,190,.18),
-    0 28px 90px rgba(0,0,0,.56);
-  filter: contrast(1.06) saturate(1.08);
+    0 26px 90px rgba(0,0,0,.55);
+  filter: saturate(1.08);
 }
 
-.hero{
-  position:absolute;
-  left: 56px;
-  bottom: 42px;
-  z-index:2;
-  pointer-events:none;
-}
-.hero-title{
-  margin:0;
-  font-size: 20px;
-  letter-spacing: .08em;
-  color: rgba(233,238,252,.72);
-  text-shadow: 0 0 22px rgba(0,0,0,.65);
-}
-
-/* ----------------- CURTAIN (TOP) ----------------- */
-.curtain{
+/* ----------------- CURTAIN CANVAS (TOP) ----------------- */
+.curtain-canvas{
   position:absolute;
   inset:0;
   z-index:20;
-  pointer-events:auto;
-
-  /* JS sets -webkit-mask-image + mask-image to a dataURL */
-  -webkit-mask-repeat:no-repeat;
-  -webkit-mask-position:0 0;
-  -webkit-mask-size:100% 100%;
-
-  mask-repeat:no-repeat;
-  mask-position:0 0;
-  mask-size:100% 100%;
+  pointer-events:none; /* button is above */
 }
 
-/* keep ONLY bluesplatts look */
-.curtain::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:0;
-  background:
-    radial-gradient(1200px 700px at 50% 60%, rgba(5,9,21,.25), rgba(5,9,21,.75)),
-    url("./assets/bluesplatts.png");
-  background-size: cover;
-  background-position:center;
-  filter: contrast(1.05) saturate(1.15);
-}
-
-/* subtle grit overlay (no new images) */
-.curtain::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:2;
-  pointer-events:none;
-  opacity:.16;
-  background:
-    repeating-radial-gradient(circle at 12% 18%,
-      rgba(255,255,255,.12) 0 1px,
-      rgba(255,255,255,0) 1px 4px);
-  mix-blend-mode: overlay;
-}
-
-.hex-canvas{
-  position:absolute;
-  inset:0;
-  z-index:1;
-  pointer-events:none;
-}
-
+/* FX */
 .fx{
   position:absolute;
   inset:0;
-  z-index:6;
+  z-index:30;
   pointer-events:none;
 }
 
-/* ----------------- CROWN ----------------- */
+/* ----------------- CROWN (YOUR OLD FORMAT) ----------------- */
 .crown-btn{
   position:absolute;
   inset:0;
-  z-index:5;
+  z-index:40;
   display:grid;
   place-items:center;
   gap: 14px;
@@ -242,21 +204,20 @@ body:not(.entered) .crown{
   50%{ transform: translateY(-10px); }
 }
 
-/* MORE aggressive smash */
+/* smash */
 body.entered .crown{
   animation: slam 520ms cubic-bezier(.08,.95,.18,1) forwards;
 }
-
 @keyframes slam{
   0%   { transform: translateY(0) scale(1); }
   45%  { transform: translateY(92vh) rotate(-10deg) scale(1.14); }
-  62%  { transform: translateY(106vh) rotate(-12deg) scale(1.22,.82); } /* IMPACT squash */
-  78%  { transform: translateY(98vh) rotate(-11deg) scale(1.15,1.02); } /* rebound */
+  62%  { transform: translateY(106vh) rotate(-12deg) scale(1.22,.82); }
+  78%  { transform: translateY(98vh) rotate(-11deg) scale(1.15,1.02); }
   100% { transform: translateY(106vh) rotate(-12deg) scale(1.18,.98); }
 }
 
-/* tiny screen shake at impact */
-body.impact .curtain{
+/* shake the whole stage at impact */
+body.impact #stage{
   animation: shake 160ms steps(2,end) 1;
 }
 @keyframes shake{
@@ -278,4 +239,8 @@ body.impact .curtain{
 
 body.entered .crown-btn{
   pointer-events:none;
+}
+
+@media (prefers-reduced-motion: reduce){
+  body:not(.entered) .crown{ animation:none; }
 }

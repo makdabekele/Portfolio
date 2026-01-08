@@ -1,6 +1,9 @@
 /* ============================
    main.js — FULL REPLACEMENT
-   Hex dissolve reveals site
+   Curtain canvas draws:
+   - bluesplatts.png (top overlay)
+   - hex grid lines (single-stroke)
+   Then erases hexes to reveal site beneath
    ============================ */
 
 const prefersReducedMotion =
@@ -8,43 +11,48 @@ const prefersReducedMotion =
 
 const SCRAMBLE = "!@#$%^&*()_+=-[]{}<>?/\\|~";
 
-const curtain = document.getElementById("curtain");
+const stage = document.getElementById("stage");
 const site = document.getElementById("site");
 const heroTitle = document.getElementById("heroTitle");
 
 const crownBtn = document.getElementById("crownBtn");
-const crownStrokeSvg = document.getElementById("crownStrokeSvg");
-const crownStrokePath = document.getElementById("crownStrokePath");
-const crownStrokeBase = document.getElementById("crownStrokeBase");
+const crownSvg = document.getElementById("crownSvg");
+const crownPath = document.getElementById("crownPath");
+const basePath  = document.getElementById("basePath");
 
-const hexCanvas = document.getElementById("hexCanvas");
+const curtainCanvas = document.getElementById("curtainCanvas");
 const fxCanvas = document.getElementById("fxCanvas");
-const hexCtx = hexCanvas.getContext("2d");
+
+const curtainCtx = curtainCanvas.getContext("2d");
 const fxCtx = fxCanvas.getContext("2d");
 
 let entered = false;
 
-/* ---------- Canvas fitting ---------- */
+/* ---------- DPR fit ---------- */
 function fitCanvas(canvas, ctx){
   const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  canvas.width  = Math.floor(window.innerWidth * dpr);
+  canvas.width = Math.floor(window.innerWidth * dpr);
   canvas.height = Math.floor(window.innerHeight * dpr);
   canvas.style.width = "100%";
   canvas.style.height = "100%";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return dpr;
 }
 
-function fitHex(){ fitCanvas(hexCanvas, hexCtx); }
-function fitFx(){ fitCanvas(fxCanvas, fxCtx); }
+function fitAll(){
+  fitCanvas(curtainCanvas, curtainCtx);
+  fitCanvas(fxCanvas, fxCtx);
+}
 
-/* ---------- Hex grid (NO overlap star) ---------- */
+/* ---------- Hex grid (tessellated, no “star overlap”) ---------- */
 let hexCells = [];
 let hexR = 28;
 
 function hexPointsFlatTop(cx, cy, r){
+  // true flat-top: start angle at 30deg
   const pts = [];
   for (let i=0;i<6;i++){
-    const a = (Math.PI/3)*i; // flat-top
+    const a = (Math.PI/3)*i + Math.PI/6;
     pts.push([cx + Math.cos(a)*r, cy + Math.sin(a)*r]);
   }
   return pts;
@@ -60,19 +68,20 @@ function buildHexGrid(){
   const dy = Math.sqrt(3) * hexR;
 
   const cells = [];
-  const cols = Math.ceil(w / dx) + 6;
-  const rows = Math.ceil(h / dy) + 6;
+  const cols = Math.ceil(w / dx) + 8;
+  const rows = Math.ceil(h / dy) + 8;
 
-  for (let c = -3; c < cols; c++){
+  for (let c = -4; c < cols; c++){
     const x = c * dx;
     const yOff = (c % 2) ? (dy/2) : 0;
 
-    for (let r = -3; r < rows; r++){
+    for (let r = -4; r < rows; r++){
       const y = r * dy + yOff;
 
       const cx = x;
       const cy = y;
-      if (cx < -140 || cx > w + 140 || cy < -140 || cy > h + 140) continue;
+
+      if (cx < -160 || cx > w + 160 || cy < -160 || cy > h + 160) continue;
 
       const pts = hexPointsFlatTop(cx, cy, hexR);
       cells.push({ cx, cy, pts });
@@ -81,132 +90,133 @@ function buildHexGrid(){
   return cells;
 }
 
-function drawHexGrid(){
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  hexCtx.clearRect(0,0,w,h);
+function drawHexGridLines(){
+  // single-stroke trick: draw only 3 edges per hex (prevents thick intersections)
+  curtainCtx.save();
+  curtainCtx.lineWidth = 1.15;
+  curtainCtx.strokeStyle = "rgba(120,170,255,0.22)";
+  curtainCtx.lineJoin = "round";
+  curtainCtx.lineCap = "round";
 
-  // draw only 3 edges per hex to avoid double-stroking shared edges
-  hexCtx.save();
-  hexCtx.lineWidth = 1.15;
-  hexCtx.strokeStyle = "rgba(120,170,255,0.22)";
-  hexCtx.lineJoin = "round";
-  hexCtx.lineCap = "round";
-
-  hexCtx.beginPath();
+  curtainCtx.beginPath();
   for (const cell of hexCells){
     const p = cell.pts;
-    // p0->p1, p1->p2, p2->p3
-    hexCtx.moveTo(p[0][0], p[0][1]); hexCtx.lineTo(p[1][0], p[1][1]);
-    hexCtx.moveTo(p[1][0], p[1][1]); hexCtx.lineTo(p[2][0], p[2][1]);
-    hexCtx.moveTo(p[2][0], p[2][1]); hexCtx.lineTo(p[3][0], p[3][1]);
+    // top-right-ish half: p0->p1, p1->p2, p2->p3
+    curtainCtx.moveTo(p[0][0], p[0][1]); curtainCtx.lineTo(p[1][0], p[1][1]);
+    curtainCtx.moveTo(p[1][0], p[1][1]); curtainCtx.lineTo(p[2][0], p[2][1]);
+    curtainCtx.moveTo(p[2][0], p[2][1]); curtainCtx.lineTo(p[3][0], p[3][1]);
   }
-  hexCtx.stroke();
-  hexCtx.restore();
+  curtainCtx.stroke();
+  curtainCtx.restore();
 }
 
-/* ---------- Dual masks (curtain hides + site reveals) ---------- */
-let curtainMaskCanvas, curtainMaskCtx;
-let siteMaskCanvas, siteMaskCtx;
-let maskDpr = 1;
+/* ---------- Curtain drawing: bluesplatts + vignette + hex lines ---------- */
+const splatImg = new Image();
+splatImg.src = "./assets/bluesplatts.png";
 
-function fitMasks(){
-  maskDpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+function drawCoverImage(ctx, img){
+  const w = window.innerWidth;
+  const h = window.innerHeight;
 
-  // curtain: white visible, black holes
-  curtainMaskCanvas = document.createElement("canvas");
-  curtainMaskCanvas.width  = Math.floor(window.innerWidth * maskDpr);
-  curtainMaskCanvas.height = Math.floor(window.innerHeight * maskDpr);
-  curtainMaskCtx = curtainMaskCanvas.getContext("2d");
-  curtainMaskCtx.setTransform(maskDpr,0,0,maskDpr,0,0);
-  curtainMaskCtx.fillStyle = "white";
-  curtainMaskCtx.fillRect(0,0,window.innerWidth,window.innerHeight);
+  // cover fit
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  if (!iw || !ih) return;
 
-  // site: black hidden, white reveals
-  siteMaskCanvas = document.createElement("canvas");
-  siteMaskCanvas.width  = Math.floor(window.innerWidth * maskDpr);
-  siteMaskCanvas.height = Math.floor(window.innerHeight * maskDpr);
-  siteMaskCtx = siteMaskCanvas.getContext("2d");
-  siteMaskCtx.setTransform(maskDpr,0,0,maskDpr,0,0);
-  siteMaskCtx.fillStyle = "black";
-  siteMaskCtx.fillRect(0,0,window.innerWidth,window.innerHeight);
+  const scale = Math.max(w/iw, h/ih);
+  const dw = iw * scale;
+  const dh = ih * scale;
+  const dx = (w - dw) / 2;
+  const dy = (h - dh) / 2;
 
-  applyMasks();
+  ctx.drawImage(img, dx, dy, dw, dh);
 }
 
-function applyMasks(){
-  // WebKit mask is the most stable here
-  const cUrl = curtainMaskCanvas.toDataURL("image/png");
-  curtain.style.webkitMaskImage = `url(${cUrl})`;
+function redrawCurtain(){
+  const w = window.innerWidth;
+  const h = window.innerHeight;
 
-  const sUrl = siteMaskCanvas.toDataURL("image/png");
-  site.style.webkitMaskImage = `url(${sUrl})`;
+  curtainCtx.clearRect(0,0,w,h);
+
+  // bluesplatts (ONLY texture you wanted)
+  drawCoverImage(curtainCtx, splatImg);
+
+  // subtle dark veil so it reads “curtain”
+  curtainCtx.save();
+  curtainCtx.fillStyle = "rgba(5,9,21,0.55)";
+  curtainCtx.fillRect(0,0,w,h);
+
+  // vignette
+  const g = curtainCtx.createRadialGradient(w*0.5, h*0.45, 40, w*0.5, h*0.45, Math.max(w,h)*0.75);
+  g.addColorStop(0, "rgba(0,0,0,0.0)");
+  g.addColorStop(1, "rgba(0,0,0,0.55)");
+  curtainCtx.fillStyle = g;
+  curtainCtx.fillRect(0,0,w,h);
+  curtainCtx.restore();
+
+  // hex lines on top
+  drawHexGridLines();
 }
 
-function punchHexBoth(pts){
-  const expand = 1.45;
+/* ---------- Erase hexes to reveal the site ---------- */
+function eraseHex(pts){
+  // expand a bit so hexes “eat” the curtain cleanly (no tiny leftover lines)
+  const expand = 1.50;
   const cx = pts.reduce((s,p)=>s+p[0],0)/6;
   const cy = pts.reduce((s,p)=>s+p[1],0)/6;
 
-  // curtain hole = black
-  curtainMaskCtx.fillStyle = "black";
-  curtainMaskCtx.beginPath();
-  curtainMaskCtx.moveTo(cx + (pts[0][0]-cx)*expand, cy + (pts[0][1]-cy)*expand);
+  curtainCtx.beginPath();
+  curtainCtx.moveTo(cx + (pts[0][0]-cx)*expand, cy + (pts[0][1]-cy)*expand);
   for (let i=1;i<6;i++){
-    curtainMaskCtx.lineTo(cx + (pts[i][0]-cx)*expand, cy + (pts[i][1]-cy)*expand);
+    curtainCtx.lineTo(cx + (pts[i][0]-cx)*expand, cy + (pts[i][1]-cy)*expand);
   }
-  curtainMaskCtx.closePath();
-  curtainMaskCtx.fill();
-
-  // site reveal = white
-  siteMaskCtx.fillStyle = "white";
-  siteMaskCtx.beginPath();
-  siteMaskCtx.moveTo(cx + (pts[0][0]-cx)*expand, cy + (pts[0][1]-cy)*expand);
-  for (let i=1;i<6;i++){
-    siteMaskCtx.lineTo(cx + (pts[i][0]-cx)*expand, cy + (pts[i][1]-cy)*expand);
-  }
-  siteMaskCtx.closePath();
-  siteMaskCtx.fill();
+  curtainCtx.closePath();
+  curtainCtx.fill();
 }
 
-function dissolveCurtainHexesFromPoint(px, py){
-  // reveal in a deterministic order (near impact -> outward)
-  const order = hexCells.slice().sort((a,b)=>{
-    const da = (a.cx-px)*(a.cx-px) + (a.cy-py)*(a.cy-py);
-    const db = (b.cx-px)*(b.cx-px) + (b.cy-py)*(b.cy-py);
-    return da - db;
-  });
+function dissolveCurtainFastRandom(){
+  // random order
+  const order = hexCells
+    .map(c => ({ c, k: Math.random() }))
+    .sort((a,b)=>a.k-b.k)
+    .map(x=>x.c);
+
+  curtainCtx.save();
+  curtainCtx.globalCompositeOperation = "destination-out";
+  curtainCtx.fillStyle = "rgba(0,0,0,1)";
 
   let i = 0;
 
+  // faster: more per frame
+  const batch = prefersReducedMotion ? 99999 : 18;
+
   function step(){
-    // TRUE one-by-one: 1 hex per frame
-    if (i < order.length){
-      punchHexBoth(order[i].pts);
-      applyMasks();
-      i++;
-      requestAnimationFrame(step);
-    } else {
-      curtain.remove();
-      scrambleReveal(heroTitle, "hi i'm makda", 900);
+    for (let j=0; j<batch && i<order.length; j++, i++){
+      eraseHex(order[i].pts);
+    }
+    if (i < order.length) requestAnimationFrame(step);
+    else {
+      curtainCtx.restore();
+      // once fully gone, you can drop the canvas entirely
+      setTimeout(()=>{ curtainCanvas.remove(); }, 80);
     }
   }
 
   requestAnimationFrame(step);
 }
 
-/* ---------- FX ---------- */
+/* ---------- Small impact pulse ---------- */
 function impactPulse(x,y){
   if (prefersReducedMotion) return;
 
   const start = performance.now();
-  const dur = 240;
+  const dur = 220;
 
   function frame(now){
     const t = Math.min(1, (now-start)/dur);
     fxCtx.clearRect(0,0,window.innerWidth,window.innerHeight);
 
-    const r = 12 + t * 260;
+    const r = 10 + t * 240;
     const a = (1 - t) * 0.55;
 
     fxCtx.save();
@@ -224,38 +234,36 @@ function impactPulse(x,y){
   requestAnimationFrame(frame);
 }
 
-/* ---------- Crown stroke draw-in (keeps doodle image) ---------- */
+/* ---------- Crown draw (stable) ---------- */
 function animateCrownDraw(){
-  if (!crownStrokeSvg || !crownStrokePath || !crownStrokeBase || prefersReducedMotion) return;
+  if (!crownPath || !basePath || prefersReducedMotion) return;
 
-  const paths = [crownStrokePath, crownStrokeBase];
-  const lens = paths.map(p => p.getTotalLength());
+  const paths = [crownPath, basePath];
+  const lengths = paths.map(p => p.getTotalLength());
 
-  paths.forEach((p, idx)=>{
-    const L = lens[idx];
+  paths.forEach((p, idx) => {
+    const len = lengths[idx];
     p.style.transition = "none";
-    p.style.strokeDasharray = `${L} ${L}`;
-    p.style.strokeDashoffset = `${L}`;
+    p.style.strokeDasharray = `${len} ${len}`;
+    p.style.strokeDashoffset = `${len}`;
   });
 
-  // flush
-  void crownStrokeSvg.getBoundingClientRect();
+  void crownSvg.getBoundingClientRect();
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      crownStrokePath.style.transition = "stroke-dashoffset 720ms cubic-bezier(.7,1.4,.2,1)";
-      crownStrokeBase.style.transition = "stroke-dashoffset 420ms cubic-bezier(.7,1.4,.2,1)";
+      crownPath.style.transition = "stroke-dashoffset 720ms cubic-bezier(.7,1.4,.2,1)";
+      basePath.style.transition  = "stroke-dashoffset 420ms cubic-bezier(.7,1.4,.2,1)";
 
-      crownStrokePath.style.strokeDashoffset = "0";
-      setTimeout(()=>{ crownStrokeBase.style.strokeDashoffset = "0"; }, 140);
+      crownPath.style.strokeDashoffset = "0";
+      setTimeout(() => { basePath.style.strokeDashoffset = "0"; }, 140);
 
-      // lock final to avoid end “bounce”
-      setTimeout(()=>{
-        paths.forEach((p, idx)=>{
-          const L = lens[idx];
+      setTimeout(() => {
+        paths.forEach((p, idx) => {
+          const len = lengths[idx];
           p.style.transition = "none";
-          p.style.strokeDasharray = `${L} ${L}`;
           p.style.strokeDashoffset = "0";
+          p.style.strokeDasharray = `${len} ${len}`;
         });
       }, 900);
     });
@@ -265,7 +273,6 @@ function animateCrownDraw(){
 /* ---------- Scramble reveal ---------- */
 function scrambleReveal(el, finalText, ms=900){
   if (!el) return;
-
   if (prefersReducedMotion){
     el.textContent = finalText;
     return;
@@ -288,42 +295,36 @@ function scrambleReveal(el, finalText, ms=900){
     if (t < 1) requestAnimationFrame(frame);
     else el.textContent = finalText;
   }
-
   requestAnimationFrame(frame);
 }
 
-/* ---------- Enter sequence ---------- */
+/* ---------- Enter ---------- */
 function enter(){
   if (entered) return;
   entered = true;
 
-  // prep sizes + masks FIRST (prevents overlay weirdness)
-  fitFx();
-  fitHex();
-  hexCells = buildHexGrid();
-  drawHexGrid();
-  fitMasks();
-
-  // now allow the site to exist visually (still masked black)
-  document.body.classList.add("revealing");
+  // make under page available BUT still hidden by curtain canvas
+  document.body.classList.add("unlocked");
   site.setAttribute("aria-hidden","false");
 
-  // slam starts immediately via CSS
+  // slam starts instantly
   document.body.classList.add("entered");
 
-  // impact coords
+  // impact moment (sync-ish with slam)
   const impactX = window.innerWidth * 0.50;
   const impactY = window.innerHeight * 0.88;
 
-  // small delay so the slam reads as “hit” then dissolve starts
-  const hitDelay = prefersReducedMotion ? 0 : 220;
+  const hitDelay = prefersReducedMotion ? 0 : 210;
 
-  setTimeout(()=>{
+  setTimeout(() => {
     document.body.classList.add("impact");
     impactPulse(impactX, impactY);
 
-    // start reveal
-    dissolveCurtainHexesFromPoint(impactX, impactY);
+    // start erasing the curtain (splat + hex) in hex chunks
+    dissolveCurtainFastRandom();
+
+    // title reveal
+    scrambleReveal(heroTitle, "hi i'm makda", 820);
 
     setTimeout(()=>document.body.classList.remove("impact"), 180);
   }, hitDelay);
@@ -332,31 +333,36 @@ function enter(){
 /* ---------- Init ---------- */
 function init(){
   entered = false;
-  document.body.classList.remove("revealing","entered","impact");
+  document.body.classList.remove("entered","impact");
+  document.body.classList.remove("unlocked");
   site.setAttribute("aria-hidden","true");
   if (heroTitle) heroTitle.textContent = "";
 
-  fitFx();
-  fitHex();
+  fitAll();
   hexCells = buildHexGrid();
-  drawHexGrid();
-  fitMasks();
+
+  // wait for splat to load before first paint (prevents flash)
+  if (splatImg.complete && splatImg.naturalWidth){
+    redrawCurtain();
+  } else {
+    splatImg.onload = () => {
+      if (!entered) redrawCurtain();
+    };
+  }
+
   animateCrownDraw();
 }
 
 window.addEventListener("DOMContentLoaded", init);
 
 window.addEventListener("resize", () => {
-  // don’t rebuild mid dissolve
   if (entered) return;
-  fitFx();
-  fitHex();
+  fitAll();
   hexCells = buildHexGrid();
-  drawHexGrid();
-  fitMasks();
+  if (splatImg.complete && splatImg.naturalWidth) redrawCurtain();
 });
 
 crownBtn.addEventListener("click", enter);
-crownBtn.addEventListener("keydown", (e)=>{
+crownBtn.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") enter();
 });
