@@ -400,6 +400,64 @@ function enter(){
 
   setTimeout(startDissolve, prefersReducedMotion ? 0 : 160);
 }
+function bindMouseDeckScroll(){
+  const rails = document.querySelectorAll("[data-deck]");
+  rails.forEach(rail => {
+    const track = rail.querySelector(".deck-track");
+    if (!track) return;
+
+    let raf = null;
+    let target = 0;
+    let current = 0;
+
+    function maxScroll(){
+      return Math.max(0, track.scrollWidth - rail.clientWidth);
+    }
+
+    function loop(){
+      const max = maxScroll();
+      current += (target - current) * 0.12; // smooth follow
+      const clamped = Math.max(0, Math.min(max, current));
+      track.style.transform = `translateX(${-clamped}px)`;
+      raf = requestAnimationFrame(loop);
+    }
+
+    rail.addEventListener("wheel", (e) => {
+  // if the deck can scroll horizontally, keep the wheel inside it
+  const max = maxScroll();
+  if (max <= 0) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  // Use vertical wheel to drive horizontal movement
+  const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  current = Math.max(0, Math.min(max, current + delta));
+  target  = current;
+
+  track.style.transform = `translateX(${-current}px)`;
+}, { passive: false });
+
+    rail.addEventListener("mousemove", (e) => {
+      const rect = rail.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width; // 0..1
+      target = x * maxScroll();
+      if (!raf) raf = requestAnimationFrame(loop);
+    });
+
+    rail.addEventListener("mouseleave", () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = null;
+    });
+
+    window.addEventListener("resize", () => {
+      const max = maxScroll();
+      current = Math.max(0, Math.min(max, current));
+      target = Math.max(0, Math.min(max, target));
+      track.style.transform = `translateX(${-current}px)`;
+    });
+  });
+}
 
 // --- Init ---
 function init(){
@@ -418,6 +476,7 @@ tabs.forEach(btn => {
   btn.classList.toggle("is-active", isOn);
   btn.setAttribute("aria-selected", isOn ? "true" : "false");
 });
+bindMouseDeckScroll();
 panels.forEach(p => {
   const isOn = p.dataset.panel === "about";
   p.classList.toggle("is-active", isOn);
