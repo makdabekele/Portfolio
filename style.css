@@ -140,7 +140,7 @@ body.unlocked .site{
     inset 0 0 0 1px rgba(233,238,252,.10),
     0 26px 105px rgba(0,0,0,.58);
 
-  backdrop-filter: blur(12px);
+  /*backdrop-filter: blur(12px);*/
   overflow:hidden;
   position:relative;
 }
@@ -280,14 +280,15 @@ body.entered .crown-btn{ pointer-events:none; }
 
 body.entered .crown{
   animation: slam 520ms cubic-bezier(.08,.95,.18,1) forwards;
+  filter: blur(2px) brightness(1.12);
 }
 
 @keyframes slam{
-  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; filter: none; }
+  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
   48%  { transform: translateY(clamp(160px, 30vh, 320px)) rotate(-8deg) scale(1.06); opacity: .95; }
   62%  { transform: translateY(clamp(190px, 34vh, 360px)) rotate(-10deg) scale(1.10, .84); opacity: .78; }
   78%  { transform: translateY(clamp(175px, 32vh, 340px)) rotate(-9deg)  scale(1.02, 1.02); opacity: .62; }
-  100% { transform: translateY(320px) rotate(-10deg) scale(.42); opacity: .14; filter: blur(2px) brightness(1.12); }
+  100% { transform: translateY(320px) rotate(-10deg) scale(.42); opacity: .14; }
 }
 
 /* click-to-begin */
@@ -339,7 +340,6 @@ body.unlocked .cta{
   opacity: 0;
   visibility: hidden;
   transform: translateY(18px) scale(.98);
-  filter: blur(10px);
   will-change: transform, opacity, filter;
 }
 
@@ -370,6 +370,44 @@ body.unlocked .cta{
   to{ opacity:1; }
 }
 
+/* About page text block */
+.about-copy{
+  position: absolute;
+  top: 34px;
+  left: 34px;
+  max-width: 520px;
+  z-index: 3;
+}
+
+.about-title{
+  margin: 0 0 14px;
+  font-size: clamp(28px, 3.1vw, 44px);
+  line-height: 1.05;
+  letter-spacing: .02em;
+}
+
+.about-text{
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(233,238,252,.88);
+}
+
+.about-text--muted{
+  margin-top: 16px;
+  font-size: 13px;
+  color: rgba(233,238,252,.60);
+}
+
+/* Optional: fade in when About tab becomes active */
+.panel.is-active .about-copy{
+  animation: aboutCopyIn 520ms ease both;
+}
+
+@keyframes aboutCopyIn{
+  from{ opacity: 0; transform: translateY(6px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
 
 
 

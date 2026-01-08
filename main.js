@@ -394,7 +394,7 @@ function enter(){
     dissolveHexCells(() => {
       document.body.classList.add("unlocked");
       setActiveTab("about");
-      scrambleReveal(heroTitle, "hi i'm makda", 520);
+      scrambleReveal(heroTitle, "makda bekele", 520);
     });
   };
 
