@@ -1,201 +1,271 @@
-const crownBtn = document.getElementById("crownBtn");
-const crownSvg = document.getElementById("crownSvg");
-const crownPath = document.getElementById("crownPath");
-const basePath  = document.getElementById("basePath");
+/* ============================
+   main.js — FULL REPLACEMENT
+   Hex dissolve reveals site
+   ============================ */
 
-const hexCanvas = document.getElementById("hexCanvas");
-const fxCanvas  = document.getElementById("fx");
+const prefersReducedMotion =
+  window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
-const site      = document.getElementById("site");
+const SCRAMBLE = "!@#$%^&*()_+=-[]{}<>?/\\|~";
+
+const curtain = document.getElementById("curtain");
+const site = document.getElementById("site");
 const heroTitle = document.getElementById("heroTitle");
 
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const crownBtn = document.getElementById("crownBtn");
+const crownStrokeSvg = document.getElementById("crownStrokeSvg");
+const crownStrokePath = document.getElementById("crownStrokePath");
+const crownStrokeBase = document.getElementById("crownStrokeBase");
 
-// EXACT scramble set you asked for:
-const SCRAMBLE = "!@#$%^&*()_+=-[]{}<>?/\\|~";
+const hexCanvas = document.getElementById("hexCanvas");
+const fxCanvas = document.getElementById("fxCanvas");
+const hexCtx = hexCanvas.getContext("2d");
+const fxCtx = fxCanvas.getContext("2d");
 
 let entered = false;
 
-// --- HEX CANVAS STATE ---
-let hexCtx = null;
-let hexDpr = 1;
-let hexCells = []; // { cx, cy, pts }
-let hexRadius = 28;
-
-// --- FX CANVAS ---
-function fitFx(){
+/* ---------- Canvas fitting ---------- */
+function fitCanvas(canvas, ctx){
   const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  fxCanvas.width = Math.floor(window.innerWidth * dpr);
-  fxCanvas.height = Math.floor(window.innerHeight * dpr);
-  fxCanvas.style.width = `${window.innerWidth}px`;
-  fxCanvas.style.height = `${window.innerHeight}px`;
-  const ctx = fxCanvas.getContext("2d");
+  canvas.width  = Math.floor(window.innerWidth * dpr);
+  canvas.height = Math.floor(window.innerHeight * dpr);
+  canvas.style.width = "100%";
+  canvas.style.height = "100%";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
-function fitHex(){
-  hexDpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  hexCanvas.width  = Math.floor(window.innerWidth * hexDpr);
-  hexCanvas.height = Math.floor(window.innerHeight * hexDpr);
-  hexCanvas.style.width  = `${window.innerWidth}px`;
-  hexCanvas.style.height = `${window.innerHeight}px`;
+function fitHex(){ fitCanvas(hexCanvas, hexCtx); }
+function fitFx(){ fitCanvas(fxCanvas, fxCtx); }
 
-  hexCtx = hexCanvas.getContext("2d");
-  hexCtx.setTransform(hexDpr, 0, 0, hexDpr, 0, 0);
-}
+/* ---------- Hex grid (NO overlap star) ---------- */
+let hexCells = [];
+let hexR = 28;
 
 function hexPointsFlatTop(cx, cy, r){
-  // flat-top hex (top edge flat) matches our spacing
   const pts = [];
-  for (let i = 0; i < 6; i++){
-    const a = (Math.PI / 180) * (60 * i);
-    pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+  for (let i=0;i<6;i++){
+    const a = (Math.PI/3)*i; // flat-top
+    pts.push([cx + Math.cos(a)*r, cy + Math.sin(a)*r]);
   }
   return pts;
 }
 
-function strokeHex(ctx, pts){
-  ctx.beginPath();
-  ctx.moveTo(pts[0][0], pts[0][1]);
-  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-  ctx.closePath();
-  ctx.stroke();
-}
-
 function buildHexGrid(){
-  if (!hexCtx) fitHex();
-
   const w = window.innerWidth;
   const h = window.innerHeight;
 
-  // tune size to feel “blueprint”
-  hexRadius = Math.max(22, Math.min(34, Math.floor(w / 52)));
+  hexR = Math.max(22, Math.min(34, Math.floor(Math.min(w,h) / 26)));
 
-  // flat-top layout spacing
-  const dx = 1.5 * hexRadius;
-  const dy = Math.sqrt(3) * hexRadius;
-
-  hexCtx.clearRect(0, 0, w, h);
-  hexCtx.lineWidth = 1;
-  hexCtx.lineJoin = "round";
-  hexCtx.strokeStyle = "rgba(120,170,255,0.16)";
+  const dx = 1.5 * hexR;
+  const dy = Math.sqrt(3) * hexR;
 
   const cells = [];
-  const cols = Math.ceil(w / dx) + 4;
-  const rows = Math.ceil(h / dy) + 4;
+  const cols = Math.ceil(w / dx) + 6;
+  const rows = Math.ceil(h / dy) + 6;
 
-  for (let c = -2; c < cols; c++){
+  for (let c = -3; c < cols; c++){
     const x = c * dx;
-    const yOffset = (c % 2) ? (dy / 2) : 0;
+    const yOff = (c % 2) ? (dy/2) : 0;
 
-    for (let rRow = -2; rRow < rows; rRow++){
-      const y = rRow * dy + yOffset;
+    for (let r = -3; r < rows; r++){
+      const y = r * dy + yOff;
 
-      if (x < -120 || x > w + 120 || y < -120 || y > h + 120) continue;
+      const cx = x;
+      const cy = y;
+      if (cx < -140 || cx > w + 140 || cy < -140 || cy > h + 140) continue;
 
-      const pts = hexPointsFlatTop(x, y, hexRadius);
-      strokeHex(hexCtx, pts);
-      cells.push({ cx: x, cy: y, pts });
+      const pts = hexPointsFlatTop(cx, cy, hexR);
+      cells.push({ cx, cy, pts });
     }
   }
-
-  // add a faint second pass for “ink wobble” (super subtle)
-  hexCtx.strokeStyle = "rgba(120,170,255,0.06)";
-  hexCtx.lineWidth = 1;
-  for (let i = 0; i < cells.length; i += 2){
-    strokeHex(hexCtx, cells[i].pts);
-  }
-
   return cells;
 }
 
-function eraseHex(ctx, pts){
-  // erase slightly bigger than stroke so it fully disappears
-  const expand = 1.45;
+function drawHexGrid(){
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  hexCtx.clearRect(0,0,w,h);
 
-  const cx = pts.reduce((s,p)=>s+p[0],0) / 6;
-  const cy = pts.reduce((s,p)=>s+p[1],0) / 6;
+  // draw only 3 edges per hex to avoid double-stroking shared edges
+  hexCtx.save();
+  hexCtx.lineWidth = 1.15;
+  hexCtx.strokeStyle = "rgba(120,170,255,0.22)";
+  hexCtx.lineJoin = "round";
+  hexCtx.lineCap = "round";
 
-  ctx.beginPath();
-  ctx.moveTo(cx + (pts[0][0]-cx)*expand, cy + (pts[0][1]-cy)*expand);
-  for (let i=1;i<6;i++){
-    ctx.lineTo(cx + (pts[i][0]-cx)*expand, cy + (pts[i][1]-cy)*expand);
+  hexCtx.beginPath();
+  for (const cell of hexCells){
+    const p = cell.pts;
+    // p0->p1, p1->p2, p2->p3
+    hexCtx.moveTo(p[0][0], p[0][1]); hexCtx.lineTo(p[1][0], p[1][1]);
+    hexCtx.moveTo(p[1][0], p[1][1]); hexCtx.lineTo(p[2][0], p[2][1]);
+    hexCtx.moveTo(p[2][0], p[2][1]); hexCtx.lineTo(p[3][0], p[3][1]);
   }
-  ctx.closePath();
-  ctx.fill();
+  hexCtx.stroke();
+  hexCtx.restore();
 }
 
-function dissolveHexCells(){
-  if (!hexCtx) return;
+/* ---------- Dual masks (curtain hides + site reveals) ---------- */
+let curtainMaskCanvas, curtainMaskCtx;
+let siteMaskCanvas, siteMaskCtx;
+let maskDpr = 1;
 
-  const order = hexCells
-    .map(c => ({ c, k: Math.random() }))
-    .sort((a,b)=>a.k-b.k)
-    .map(x=>x.c);
+function fitMasks(){
+  maskDpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
-  // “reveal below” = actual cut-out
-  hexCtx.save();
-  hexCtx.globalCompositeOperation = "destination-out";
-  hexCtx.fillStyle = "rgba(0,0,0,1)";
+  // curtain: white visible, black holes
+  curtainMaskCanvas = document.createElement("canvas");
+  curtainMaskCanvas.width  = Math.floor(window.innerWidth * maskDpr);
+  curtainMaskCanvas.height = Math.floor(window.innerHeight * maskDpr);
+  curtainMaskCtx = curtainMaskCanvas.getContext("2d");
+  curtainMaskCtx.setTransform(maskDpr,0,0,maskDpr,0,0);
+  curtainMaskCtx.fillStyle = "white";
+  curtainMaskCtx.fillRect(0,0,window.innerWidth,window.innerHeight);
+
+  // site: black hidden, white reveals
+  siteMaskCanvas = document.createElement("canvas");
+  siteMaskCanvas.width  = Math.floor(window.innerWidth * maskDpr);
+  siteMaskCanvas.height = Math.floor(window.innerHeight * maskDpr);
+  siteMaskCtx = siteMaskCanvas.getContext("2d");
+  siteMaskCtx.setTransform(maskDpr,0,0,maskDpr,0,0);
+  siteMaskCtx.fillStyle = "black";
+  siteMaskCtx.fillRect(0,0,window.innerWidth,window.innerHeight);
+
+  applyMasks();
+}
+
+function applyMasks(){
+  // WebKit mask is the most stable here
+  const cUrl = curtainMaskCanvas.toDataURL("image/png");
+  curtain.style.webkitMaskImage = `url(${cUrl})`;
+
+  const sUrl = siteMaskCanvas.toDataURL("image/png");
+  site.style.webkitMaskImage = `url(${sUrl})`;
+}
+
+function punchHexBoth(pts){
+  const expand = 1.45;
+  const cx = pts.reduce((s,p)=>s+p[0],0)/6;
+  const cy = pts.reduce((s,p)=>s+p[1],0)/6;
+
+  // curtain hole = black
+  curtainMaskCtx.fillStyle = "black";
+  curtainMaskCtx.beginPath();
+  curtainMaskCtx.moveTo(cx + (pts[0][0]-cx)*expand, cy + (pts[0][1]-cy)*expand);
+  for (let i=1;i<6;i++){
+    curtainMaskCtx.lineTo(cx + (pts[i][0]-cx)*expand, cy + (pts[i][1]-cy)*expand);
+  }
+  curtainMaskCtx.closePath();
+  curtainMaskCtx.fill();
+
+  // site reveal = white
+  siteMaskCtx.fillStyle = "white";
+  siteMaskCtx.beginPath();
+  siteMaskCtx.moveTo(cx + (pts[0][0]-cx)*expand, cy + (pts[0][1]-cy)*expand);
+  for (let i=1;i<6;i++){
+    siteMaskCtx.lineTo(cx + (pts[i][0]-cx)*expand, cy + (pts[i][1]-cy)*expand);
+  }
+  siteMaskCtx.closePath();
+  siteMaskCtx.fill();
+}
+
+function dissolveCurtainHexesFromPoint(px, py){
+  // reveal in a deterministic order (near impact -> outward)
+  const order = hexCells.slice().sort((a,b)=>{
+    const da = (a.cx-px)*(a.cx-px) + (a.cy-py)*(a.cy-py);
+    const db = (b.cx-px)*(b.cx-px) + (b.cy-py)*(b.cy-py);
+    return da - db;
+  });
 
   let i = 0;
-  const step = () => {
-    const batch = prefersReducedMotion ? 9999 : 2; // tune speed here
-    for (let j = 0; j < batch && i < order.length; j++, i++){
-      eraseHex(hexCtx, order[i].pts);
+
+  function step(){
+    // TRUE one-by-one: 1 hex per frame
+    if (i < order.length){
+      punchHexBoth(order[i].pts);
+      applyMasks();
+      i++;
+      requestAnimationFrame(step);
+    } else {
+      curtain.remove();
+      scrambleReveal(heroTitle, "hi i'm makda", 900);
     }
-    if (i < order.length) requestAnimationFrame(step);
-    else hexCtx.restore();
-  };
+  }
 
   requestAnimationFrame(step);
 }
 
-/* ---------------------------
-   Crown draw (stable, no bounce)
----------------------------- */
+/* ---------- FX ---------- */
+function impactPulse(x,y){
+  if (prefersReducedMotion) return;
+
+  const start = performance.now();
+  const dur = 240;
+
+  function frame(now){
+    const t = Math.min(1, (now-start)/dur);
+    fxCtx.clearRect(0,0,window.innerWidth,window.innerHeight);
+
+    const r = 12 + t * 260;
+    const a = (1 - t) * 0.55;
+
+    fxCtx.save();
+    fxCtx.globalCompositeOperation = "lighter";
+    fxCtx.lineWidth = 2.5;
+    fxCtx.strokeStyle = `rgba(0,255,190,${a})`;
+    fxCtx.beginPath();
+    fxCtx.arc(x,y,r,0,Math.PI*2);
+    fxCtx.stroke();
+    fxCtx.restore();
+
+    if (t < 1) requestAnimationFrame(frame);
+    else fxCtx.clearRect(0,0,window.innerWidth,window.innerHeight);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Crown stroke draw-in (keeps doodle image) ---------- */
 function animateCrownDraw(){
-  if (!crownPath || !basePath || prefersReducedMotion) return;
+  if (!crownStrokeSvg || !crownStrokePath || !crownStrokeBase || prefersReducedMotion) return;
 
-  const paths = [crownPath, basePath];
-  const lengths = paths.map(p => p.getTotalLength());
+  const paths = [crownStrokePath, crownStrokeBase];
+  const lens = paths.map(p => p.getTotalLength());
 
-  // prep
-  paths.forEach((p, idx) => {
-    const len = lengths[idx];
+  paths.forEach((p, idx)=>{
+    const L = lens[idx];
     p.style.transition = "none";
-    p.style.strokeDasharray = `${len} ${len}`; // stable
-    p.style.strokeDashoffset = `${len}`;
+    p.style.strokeDasharray = `${L} ${L}`;
+    p.style.strokeDashoffset = `${L}`;
   });
 
-  void crownSvg.getBoundingClientRect();
+  // flush
+  void crownStrokeSvg.getBoundingClientRect();
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      crownPath.style.transition = "stroke-dashoffset 720ms cubic-bezier(.7,1.4,.2,1)";
-      basePath.style.transition  = "stroke-dashoffset 420ms cubic-bezier(.7,1.4,.2,1)";
+      crownStrokePath.style.transition = "stroke-dashoffset 720ms cubic-bezier(.7,1.4,.2,1)";
+      crownStrokeBase.style.transition = "stroke-dashoffset 420ms cubic-bezier(.7,1.4,.2,1)";
 
-      crownPath.style.strokeDashoffset = "0";
-      setTimeout(() => { basePath.style.strokeDashoffset = "0"; }, 140);
+      crownStrokePath.style.strokeDashoffset = "0";
+      setTimeout(()=>{ crownStrokeBase.style.strokeDashoffset = "0"; }, 140);
 
-      // finalize WITHOUT switching dasharray modes (prevents start-point bounce)
-      setTimeout(() => {
-        paths.forEach((p, idx) => {
-          const len = lengths[idx];
+      // lock final to avoid end “bounce”
+      setTimeout(()=>{
+        paths.forEach((p, idx)=>{
+          const L = lens[idx];
           p.style.transition = "none";
+          p.style.strokeDasharray = `${L} ${L}`;
           p.style.strokeDashoffset = "0";
-          p.style.strokeDasharray = `${len} ${len}`;
         });
       }, 900);
     });
   });
 }
 
-/* ---------------------------
-   Scramble reveal (with a tiny stutter)
----------------------------- */
-function scrambleReveal(el, finalText, ms = 900){
+/* ---------- Scramble reveal ---------- */
+function scrambleReveal(el, finalText, ms=900){
   if (!el) return;
+
   if (prefersReducedMotion){
     el.textContent = finalText;
     return;
@@ -205,144 +275,88 @@ function scrambleReveal(el, finalText, ms = 900){
   const len = finalText.length;
 
   function frame(now){
-    const t = Math.min(1, (now - start) / ms);
+    const t = Math.min(1, (now-start)/ms);
     const revealCount = Math.floor(t * len);
 
-    const stutter = (t > 0.72 && t < 0.88 && Math.random() < 0.20);
-
     let out = "";
-    for (let i = 0; i < len; i++){
-      if (i < revealCount && !stutter) out += finalText[i];
-      else out += SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)];
+    for (let i=0;i<len;i++){
+      if (i < revealCount) out += finalText[i];
+      else out += SCRAMBLE[Math.floor(Math.random()*SCRAMBLE.length)];
     }
-
     el.textContent = out;
 
     if (t < 1) requestAnimationFrame(frame);
-    else {
-      el.textContent = finalText;
-      el.animate(
-        [{ transform:"translateY(-1px)" }, { transform:"translateY(0px)" }],
-        { duration: 140, easing:"cubic-bezier(.2,.9,.2,1)" }
-      );
-    }
+    else el.textContent = finalText;
   }
 
   requestAnimationFrame(frame);
 }
 
-/* ---------------------------
-   Particle burst (toxic glow)
----------------------------- */
-function rand(min, max){ return min + Math.random() * (max - min); }
-
-function burstFromCrown(){
-  if (prefersReducedMotion) return;
-
-  const rect = crownBtn.getBoundingClientRect();
-  const originX = rect.left + rect.width / 2;
-  const originY = rect.top + rect.height / 2 + 8;
-
-  const ctx = fxCanvas.getContext("2d");
-  const particles = [];
-  const n = 130;
-
-  for (let i = 0; i < n; i++){
-    const a = rand(-Math.PI * 0.95, -Math.PI * 0.05);
-    const sp = rand(4.5, 13.0);
-    particles.push({
-      x: originX,
-      y: originY,
-      vx: Math.cos(a) * sp + rand(-1.2, 1.2),
-      vy: Math.sin(a) * sp - rand(0, 2),
-      life: rand(420, 820),
-      age: 0,
-      r: rand(1.2, 3.6),
-      hue: rand(38, 66),     // gold → toxic green range
-      sat: rand(85, 98),
-      lit: rand(55, 72),
-      alpha: rand(0.60, 0.95)
-    });
-  }
-
-  const g = 0.30;
-  const drag = 0.985;
-  const start = performance.now();
-
-  function draw(now){
-    const dt = Math.min(32, now - (draw._last || now));
-    draw._last = now;
-
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-    // additive-ish look
-    ctx.save();
-    ctx.globalCompositeOperation = "lighter";
-
-    for (const p of particles){
-      p.age += dt;
-
-      p.vx *= drag;
-      p.vy = p.vy * drag + g * (dt / 16);
-
-      p.x += p.vx * (dt / 16);
-      p.y += p.vy * (dt / 16);
-
-      const k = Math.max(0, 1 - p.age / p.life);
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r * (0.7 + 0.7 * k), 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${p.hue} ${p.sat}% ${p.lit}% / ${p.alpha * k})`;
-      ctx.fill();
-    }
-
-    ctx.restore();
-
-    const alive = particles.some(p => p.age < p.life);
-    if (alive && now - start < 1300) requestAnimationFrame(draw);
-    else ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-  }
-
-  requestAnimationFrame(draw);
-}
-
-/* ---------------------------
-   Click sequence
----------------------------- */
+/* ---------- Enter sequence ---------- */
 function enter(){
   if (entered) return;
   entered = true;
 
-  document.body.classList.add("entered");
-  burstFromCrown();
-
-  setTimeout(() => {
-    document.body.classList.add("unlocked");
-    dissolveHexCells();
-    scrambleReveal(heroTitle, "hi i'm makda", 900);
-  }, prefersReducedMotion ? 0 : 220);
-}
-
-/* ---------------------------
-   Init
----------------------------- */
-function init(){
+  // prep sizes + masks FIRST (prevents overlay weirdness)
   fitFx();
   fitHex();
   hexCells = buildHexGrid();
-  animateCrownDraw();
+  drawHexGrid();
+  fitMasks();
 
+  // now allow the site to exist visually (still masked black)
+  document.body.classList.add("revealing");
+  site.setAttribute("aria-hidden","false");
+
+  // slam starts immediately via CSS
+  document.body.classList.add("entered");
+
+  // impact coords
+  const impactX = window.innerWidth * 0.50;
+  const impactY = window.innerHeight * 0.88;
+
+  // small delay so the slam reads as “hit” then dissolve starts
+  const hitDelay = prefersReducedMotion ? 0 : 220;
+
+  setTimeout(()=>{
+    document.body.classList.add("impact");
+    impactPulse(impactX, impactY);
+
+    // start reveal
+    dissolveCurtainHexesFromPoint(impactX, impactY);
+
+    setTimeout(()=>document.body.classList.remove("impact"), 180);
+  }, hitDelay);
+}
+
+/* ---------- Init ---------- */
+function init(){
+  entered = false;
+  document.body.classList.remove("revealing","entered","impact");
+  site.setAttribute("aria-hidden","true");
   if (heroTitle) heroTitle.textContent = "";
+
+  fitFx();
+  fitHex();
+  hexCells = buildHexGrid();
+  drawHexGrid();
+  fitMasks();
+  animateCrownDraw();
 }
 
 window.addEventListener("DOMContentLoaded", init);
+
 window.addEventListener("resize", () => {
+  // don’t rebuild mid dissolve
+  if (entered) return;
   fitFx();
   fitHex();
   hexCells = buildHexGrid();
+  drawHexGrid();
+  fitMasks();
 });
 
 crownBtn.addEventListener("click", enter);
-crownBtn.addEventListener("keydown", (e) => {
+crownBtn.addEventListener("keydown", (e)=>{
   if (e.key === "Enter" || e.key === " ") enter();
 });
