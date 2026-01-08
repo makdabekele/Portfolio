@@ -16,10 +16,10 @@ let entered = false;
 // --- HEX CANVAS STATE ---
 let hexCtx = null;
 let hexDpr = 1;
-let hexCells = []; // { cx, cy, pts }
+let hexCells = [];
 let hexRadius = 28;
 
-// --- SPLAT IMAGE (DRAWN ON HEX CANVAS SO IT DISSOLVES WITH HEXES) ---
+// --- SPLAT IMAGE ---
 const splatImg = new Image();
 splatImg.src = "./assets/bluesplatts.png";
 let splatReady = false;
@@ -48,7 +48,7 @@ function fitHex(){
   hexCtx.setTransform(hexDpr, 0, 0, hexDpr, 0, 0);
 }
 
-// --- HEX GEOMETRY (your flat-top, tight packing) ---
+// --- HEX GEOMETRY ---
 function hexPointsFlatTop(cx, cy, r){
   const pts = [];
   for (let i = 0; i < 6; i++){
@@ -64,7 +64,6 @@ function buildHexGrid(){
   const w = window.innerWidth;
   const h = window.innerHeight;
 
-  // keep your “blueprint” feel
   hexRadius = Math.max(22, Math.min(34, Math.floor(w / 52)));
 
   const dx = 1.5 * hexRadius;
@@ -80,19 +79,15 @@ function buildHexGrid(){
 
     for (let rRow = -3; rRow < rows; rRow++){
       const y = rRow * dy + yOffset;
-
       if (x < -140 || x > w + 140 || y < -140 || y > h + 140) continue;
-
       const pts = hexPointsFlatTop(x, y, hexRadius);
       cells.push({ cx: x, cy: y, pts });
     }
   }
-
   return cells;
 }
 
-// --- DRAW CURTAIN: SPLAT + FILLED HEX TILES + OUTLINE ---
-// key idea: the hex layer must be SOLID so it actually hides the page behind
+// --- DRAW CURTAIN ---
 function redrawCurtain(){
   if (!hexCtx) return;
 
@@ -101,16 +96,13 @@ function redrawCurtain(){
 
   hexCtx.clearRect(0, 0, w, h);
 
-  // 1) Base dark veil so the page behind is NOT visible until hex is removed
   hexCtx.save();
   hexCtx.globalCompositeOperation = "source-over";
-  hexCtx.fillStyle = "rgba(5, 8, 16, 0.86)"; // strong enough to act as curtain
+  hexCtx.fillStyle = "rgba(5, 8, 16, 0.86)";
   hexCtx.fillRect(0, 0, w, h);
   hexCtx.restore();
 
-  // 2) bluesplatts on the SAME canvas (so it dissolves per hex)
   if (splatReady){
-    // cover draw
     const iw = splatImg.naturalWidth || splatImg.width;
     const ih = splatImg.naturalHeight || splatImg.height;
 
@@ -127,10 +119,9 @@ function redrawCurtain(){
     hexCtx.restore();
   }
 
-  // 3) Fill each hex tile (this is what blocks the page behind)
   hexCtx.save();
   hexCtx.globalCompositeOperation = "source-over";
-  hexCtx.fillStyle = "rgba(5, 8, 16, 0.94)"; // tile fill
+  hexCtx.fillStyle = "rgba(5, 8, 16, 0.94)";
   for (const cell of hexCells){
     const p = cell.pts;
     hexCtx.beginPath();
@@ -141,7 +132,6 @@ function redrawCurtain(){
   }
   hexCtx.restore();
 
-  // 4) Outline (single-stroke feel, no overlap-star look)
   hexCtx.save();
   hexCtx.lineWidth = 1.15;
   hexCtx.strokeStyle = "rgba(120,170,255,0.18)";
@@ -151,7 +141,6 @@ function redrawCurtain(){
   hexCtx.beginPath();
   for (const cell of hexCells){
     const p = cell.pts;
-    // only 3 edges to avoid double-stroking shared edges
     hexCtx.moveTo(p[0][0], p[0][1]); hexCtx.lineTo(p[1][0], p[1][1]);
     hexCtx.moveTo(p[1][0], p[1][1]); hexCtx.lineTo(p[2][0], p[2][1]);
     hexCtx.moveTo(p[2][0], p[2][1]); hexCtx.lineTo(p[3][0], p[3][1]);
@@ -160,9 +149,9 @@ function redrawCurtain(){
   hexCtx.restore();
 }
 
-// --- ERASE HEX (punch holes through the curtain) ---
+// --- ERASE HEX ---
 function eraseHex(ctx, pts){
-  const expand = 1.55; // slightly bigger so it fully clears fill+stroke
+  const expand = 1.55;
   const cx = pts.reduce((s,p)=>s+p[0],0) / 6;
   const cy = pts.reduce((s,p)=>s+p[1],0) / 6;
 
@@ -178,7 +167,6 @@ function eraseHex(ctx, pts){
 function dissolveHexCells(onDone){
   if (!hexCtx) return;
 
-  // random order (your vibe)
   const order = hexCells
     .map(c => ({ c, k: Math.random() }))
     .sort((a,b)=>a.k-b.k)
@@ -189,8 +177,6 @@ function dissolveHexCells(onDone){
   hexCtx.fillStyle = "rgba(0,0,0,1)";
 
   let i = 0;
-
-  // faster (this is the speed knob)
   const batch = prefersReducedMotion ? 9999 : 10;
 
   const step = () => {
@@ -243,8 +229,8 @@ function animateCrownDraw(){
   });
 }
 
-// --- Scramble reveal ---
-function scrambleReveal(el, finalText, ms = 900){
+// --- Scramble reveal (FASTER) ---
+function scrambleReveal(el, finalText, ms = 520){
   if (!el) return;
   if (prefersReducedMotion){
     el.textContent = finalText;
@@ -257,8 +243,7 @@ function scrambleReveal(el, finalText, ms = 900){
   function frame(now){
     const t = Math.min(1, (now - start) / ms);
     const revealCount = Math.floor(t * len);
-
-    const stutter = (t > 0.72 && t < 0.88 && Math.random() < 0.20);
+    const stutter = (t > 0.78 && t < 0.90 && Math.random() < 0.14);
 
     let out = "";
     for (let i = 0; i < len; i++){
@@ -275,7 +260,7 @@ function scrambleReveal(el, finalText, ms = 900){
   requestAnimationFrame(frame);
 }
 
-// --- Particle burst (unchanged) ---
+// --- Particle burst ---
 function rand(min, max){ return min + Math.random() * (max - min); }
 
 function burstFromCrown(){
@@ -293,8 +278,7 @@ function burstFromCrown(){
     const a = rand(-Math.PI * 0.95, -Math.PI * 0.05);
     const sp = rand(4.5, 13.0);
     particles.push({
-      x: originX,
-      y: originY,
+      x: originX, y: originY,
       vx: Math.cos(a) * sp + rand(-1.2, 1.2),
       vy: Math.sin(a) * sp - rand(0, 2),
       life: rand(420, 820),
@@ -321,7 +305,6 @@ function burstFromCrown(){
 
     for (const p of particles){
       p.age += dt;
-
       p.vx *= drag;
       p.vy = p.vy * drag + g * (dt / 16);
 
@@ -346,8 +329,39 @@ function burstFromCrown(){
   requestAnimationFrame(draw);
 }
 
-// --- Click sequence ---
-// IMPORTANT: do NOT unlock site until the curtain has holes
+/* -------- Tabs -------- */
+function setActiveTab(name){
+  const tabs = document.querySelectorAll(".tab[data-tab]");
+  const panels = document.querySelectorAll(".panel[data-panel]");
+
+  tabs.forEach(btn => {
+    const isOn = btn.dataset.tab === name;
+    btn.classList.toggle("is-active", isOn);
+    btn.setAttribute("aria-selected", isOn ? "true" : "false");
+  });
+
+  panels.forEach(p => {
+    const isOn = p.dataset.panel === name;
+    p.classList.toggle("is-active", isOn);
+    if (isOn) p.removeAttribute("hidden");
+    else p.setAttribute("hidden", "");
+  });
+}
+
+function bindTabs(){
+  const tabs = document.querySelectorAll(".tab[data-tab]");
+  tabs.forEach(btn => {
+    btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        setActiveTab(btn.dataset.tab);
+      }
+    });
+  });
+}
+
+// --- Click sequence (unchanged) ---
 function enter(){
   if (entered) return;
   entered = true;
@@ -357,8 +371,9 @@ function enter(){
 
   const startDissolve = () => {
     dissolveHexCells(() => {
-      document.body.classList.add("unlocked"); // only after the curtain is gone
-      scrambleReveal(heroTitle, "hi i'm makda", 900);
+      document.body.classList.add("unlocked");
+      setActiveTab("about");
+      scrambleReveal(heroTitle, "hi i'm makda", 520);
     });
   };
 
@@ -373,6 +388,9 @@ function init(){
   redrawCurtain();
   animateCrownDraw();
 
+  bindTabs();
+  setActiveTab("about");
+
   if (heroTitle) heroTitle.textContent = "";
 
   document.body.classList.remove("entered","unlocked");
@@ -381,7 +399,7 @@ function init(){
 
 window.addEventListener("DOMContentLoaded", init);
 window.addEventListener("resize", () => {
-  if (entered) return; // don't rebuild mid dissolve
+  if (entered) return;
   fitFx();
   fitHex();
   hexCells = buildHexGrid();
@@ -392,3 +410,5 @@ crownBtn.addEventListener("click", enter);
 crownBtn.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") enter();
 });
+
+

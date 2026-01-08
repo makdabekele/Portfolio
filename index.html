@@ -11,37 +11,36 @@
     <!-- TOP "CURTAIN" CANVAS: bluesplatts + hex grid live here -->
     <canvas id="curtainCanvas" class="curtain-canvas" aria-hidden="true"></canvas>
 
-    <!-- FX CANVAS (optional pulse/burst) -->
+    <!-- FX CANVAS (pulse/burst) -->
     <canvas id="fxCanvas" class="fx" aria-hidden="true"></canvas>
 
     <!-- Crown (only visible object on boot) -->
     <button id="crownBtn" class="crown-btn" type="button" aria-label="Enter site">
       <svg id="crownSvg" class="crown" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path id="crownPath"
-    d="M18 64
-       L18 30
-       Q18 26 22 30
-       L44 52
-       Q46 56 49 50
-       L60 10
-       Q62 7 65 12
-       L77 50
-       Q79 56 83 52
-       L102 30
-       Q106 26 102 33
-       L102 64
-       Q70 70 60 70
-       Q40 70 18 64"
-    stroke="#FFF6C1" stroke-width="5"
-    stroke-linecap="round" stroke-linejoin="round"
-  />
-  <path id="basePath"
-    d="M18 64 L102 64"
-    stroke="rgba(255,246,193,0.55)" stroke-width="4"
-    stroke-linecap="round"
-  />
-</svg>
-
+        <path id="crownPath"
+          d="M18 64
+            L18 30
+            Q18 26 22 30
+            L44 52
+            Q46 56 49 50
+            L60 10
+            Q62 7 65 12
+            L77 50
+            Q79 56 83 52
+            L102 30
+            Q106 26 102 33
+            L102 64
+            Q70 70 60 70
+            Q40 70 18 64"
+          stroke="#FFF6C1" stroke-width="5"
+          stroke-linecap="round" stroke-linejoin="round"
+        />
+        <path id="basePath"
+          d="M18 64 L102 64"
+          stroke="rgba(255,246,193,0.55)" stroke-width="4"
+          stroke-linecap="round"
+        />
+      </svg>
 
       <div class="cta" aria-hidden="true">
         <div class="cta-top">click the crown</div>
@@ -49,37 +48,91 @@
       </div>
     </button>
 
-    <!-- MAIN SITE (UNDER) -->
+    <!-- MAIN SITE (UNDER CURTAIN) -->
     <section id="site" class="site" aria-label="Homepage">
-      <header class="site-header">
-        <div id="heroTitle" class="hero-title" aria-live="polite"></div>
-      </header>
+      <div class="folder-shell" role="application" aria-label="Folder interface">
+        <nav class="folder-tabs" role="tablist" aria-label="Sections">
+          <button class="tab is-active" role="tab" aria-selected="true" data-tab="about" id="tab-about">
+            About Me
+          </button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="identity" id="tab-identity">
+            Identity
+          </button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="music" id="tab-music">
+            Music Culture
+          </button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="archive" id="tab-archive">
+            Archive
+          </button>
+        </nav>
 
-      <section class="cards" aria-label="Sections">
-        <a class="card c1" href="work_01.html">
-          <div class="card-title">WORK 01</div>
-          <div class="card-sub">Identity / symbol / control</div>
-          <div class="card-tag">archive node 01</div>
-        </a>
+        <div class="folder-body">
+          <!-- Panel: ABOUT -->
+          <section class="panel is-active" role="tabpanel" aria-labelledby="tab-about" data-panel="about">
+            <div class="panel-inner">
+              <div class="about-intro">
+                <div class="intro-row">
+  <div id="heroTitle" class="intro-line" aria-live="polite"></div>
 
-        <a class="card c2" href="work_02.html">
-          <div class="card-title">WORK 02</div>
-          <div class="card-sub">Memory / metadata / signal</div>
-          <div class="card-tag">archive node 02</div>
-        </a>
+  <svg class="mini-crown" viewBox="0 0 120 80" fill="none" aria-hidden="true">
+    <path
+      d="M18 64
+        L18 30
+        Q18 26 22 30
+        L44 52
+        Q46 56 49 50
+        L60 10
+        Q62 7 65 12
+        L77 50
+        Q79 56 83 52
+        L102 30
+        Q106 26 102 33
+        L102 64
+        Q70 70 60 70
+        Q40 70 18 64"
+      stroke="rgba(233,238,252,0.88)" stroke-width="5"
+      stroke-linecap="round" stroke-linejoin="round"
+    />
+  </svg>
+</div>
 
-        <a class="card c3" href="work_03.html">
-          <div class="card-title">WORK 03</div>
-          <div class="card-sub">Speed / power / spectacle</div>
-          <div class="card-tag">archive node 03</div>
-        </a>
+                <div class="intro-sub">
+                </div>
+              </div>
 
-        <a class="card c4" href="about.html">
-          <div class="card-title">ABOUT</div>
-          <div class="card-sub">Who I am + what I do</div>
-          <div class="card-tag">bio / contact</div>
-        </a>
-      </section>
+          </section>
+
+          <!-- Panel: IDENTITY -->
+          <section class="panel" role="tabpanel" aria-labelledby="tab-identity" data-panel="identity" hidden>
+            <div class="panel-inner">
+              <div class="placeholder">
+                <div class="ph-title">Identity</div>
+                <div class="ph-sub">coming soon</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Panel: MUSIC -->
+          <section class="panel" role="tabpanel" aria-labelledby="tab-music" data-panel="music" hidden>
+            <div class="panel-inner">
+              <div class="placeholder">
+                <div class="ph-title">Music Culture</div>
+                <div class="ph-sub">coming soon</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Panel: ARCHIVE -->
+          <section class="panel" role="tabpanel" aria-labelledby="tab-archive" data-panel="archive" hidden>
+            <div class="panel-inner">
+              <div class="placeholder">
+                <div class="ph-title">Archive</div>
+                <div class="ph-sub">coming soon</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
     </section>
   </main>
 

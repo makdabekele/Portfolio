@@ -52,7 +52,6 @@ body{
 body.entered .fx{ opacity:1; }
 
 /* ----------------- SITE (UNDER) ----------------- */
-/* site always rendered behind the curtain */
 .site{
   position:absolute;
   inset:0;
@@ -60,124 +59,173 @@ body.entered .fx{ opacity:1; }
   opacity: 1;
   pointer-events:none;
 }
-
-/* ONLY enable interaction after dissolve finishes */
 body.unlocked .site{
   pointer-events:auto;
 }
 
-
-/* top-left title */
-.site-header{
+/* ----------------- FOLDER UI (tighter margins) ----------------- */
+.folder-shell{
   position:absolute;
-  top: 22px;
-  left: 22px;
-  z-index:2;
+  inset:0;
+
+  /* tighter than before */
+  padding: 10px 10px 12px;
+
+  display:grid;
+  place-items:start center;
 }
 
-.hero-title{
+.folder-tabs{
+  width: min(1320px, calc(100vw - 20px)); /* wider */
+  display:flex;
+  gap: 10px;
+  align-items:flex-end;
+  justify-content:flex-start;
   position:relative;
-  font-size: clamp(22px, 2.2vw, 34px);
-  letter-spacing: 0.02em;
-  white-space: pre;
-  padding: 10px 14px;
-  border-radius: 22px;
+  z-index:2;
+  padding-left: 2px;
+}
 
-  background: rgba(5, 8, 16, 0.38);
+/* Bigger tabs + clearer active state */
+.tab{
+  appearance:none;
+  border:0;
+  cursor:pointer;
+  font-family: var(--mono);
+
+  /* BIGGER LABELS */
+  font-size: 15px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+
+  color: rgba(233,238,252,.78);
+  padding: 14px 18px 13px;
+  border-radius: 16px 16px 14px 14px;
+
+  background: rgba(5,8,16,.44);
   box-shadow:
     inset 0 0 0 1px rgba(233,238,252,.10),
-    0 18px 60px rgba(0,0,0,.45);
+    0 10px 30px rgba(0,0,0,.30);
+
+  transition: transform 140ms ease, filter 140ms ease, background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.tab:hover{
+  filter: saturate(1.10);
+  transform: translateY(-1px);
+}
+
+/* Active: bigger + brighter + underline strip */
+.tab.is-active{
+  color: rgba(233,238,252,.98);
+  background: rgba(5,8,16,.74);
+
+  transform: translateY(-3px) scale(1.06);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(120,170,255,.22),
+    inset 0 -3px 0 rgba(0,255,190,.18),
+    0 18px 55px rgba(0,0,0,.50);
+}
+
+/* Folder body: more screen space */
+.folder-body{
+  width: min(1320px, calc(100vw - 20px));      /* wider */
+  height: calc(100vh - 78px);                   /* taller (tabs take less) */
+  margin-top: 10px;
+
+  border-radius: 22px;                          /* slightly tighter */
+  background: rgba(5,8,16,.36);
+  box-shadow:
+    inset 0 0 0 1px rgba(233,238,252,.10),
+    0 26px 105px rgba(0,0,0,.58);
+
+  backdrop-filter: blur(12px);
+  overflow:hidden;
+  position:relative;
+}
+
+.panel{ position:absolute; inset:0; }
+
+.panel-inner{
+  position:relative;
+  height:100%;
+  padding: 14px; /* tighter */
+}
+
+/* bottom-left intro bubble */
+.intro-row{
+  display:flex;
+  align-items:flex-end; /* key: bottoms align */
+  gap: 14px;
+}
+
+.mini-crown{
+  height: 34px;
+  width: auto;
+  opacity: .85;
+  flex: 0 0 auto;
+
+  /* tiny nudge so it visually sits on the same baseline */
+  transform: translateY(2px);
+
+  filter:
+    drop-shadow(0 10px 22px rgba(0,0,0,.45))
+    drop-shadow(0 0 16px rgba(0,255,190,.08));
+}
+
+.about-intro{
+  position:absolute;
+  left: 14px;
+  bottom: 14px;
+
+  max-width: min(760px, calc(100% - 28px));
+  padding: 14px 16px;
+  border-radius: 18px;
+
+  background: rgba(5,8,16,.62);
+  box-shadow:
+    inset 0 0 0 1px rgba(233,238,252,.10),
+    0 18px 60px rgba(0,0,0,.46);
 
   text-shadow:
     1px 0 rgba(255,60,120,.22),
    -1px 0 rgba(60,220,255,.18),
     0 0 18px rgba(0,255,190,.08);
-  backdrop-filter: blur(10px);
 }
 
-/* Cards */
-.cards{
-  position:absolute;
-  left: 22px;
-  top: clamp(96px, 13vh, 132px);
-  width: min(1120px, calc(100vw - 44px));
+.intro-line{
+  font-size: clamp(22px, 2.2vw, 36px);
+  letter-spacing: .01em;
+  white-space: pre;
+}
+
+.muted{ color: var(--muted); }
+
+/* placeholders */
+.placeholder{
+  height:100%;
   display:grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  place-items:center;
+  text-align:center;
+  gap: 10px;
 }
 
-.card{
-  position:relative;
-  text-decoration:none;
-  color: var(--fg);
-  padding: 22px 22px 18px;
-  border-radius: 22px;
-  min-height: 150px;
-  overflow:hidden;
-
-  background:
-    radial-gradient(780px 260px at 18% 0%, rgba(0,255,190,.07), transparent 55%),
-    radial-gradient(640px 260px at 120% 120%, rgba(255,170,40,.08), transparent 55%),
-    rgba(5, 8, 16, 0.40);
-
-  box-shadow:
-    inset 0 0 0 1px rgba(233,238,252,.10),
-    0 18px 44px rgba(0,0,0,.42);
-
-  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
-  backdrop-filter: blur(12px);
-}
-
-.card::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius: 22px;
-  pointer-events:none;
-  box-shadow:
-    inset 0 0 0 1px rgba(120,170,255,.16),
-    inset 1px 0 0 rgba(255,60,120,.10),
-    inset -1px 0 0 rgba(0,255,190,.10);
-  opacity:.85;
-}
-
-.card-title{
-  font-size: 26px;
-  letter-spacing: 0.16em;
+.ph-title{
+  font-size: clamp(26px, 3.0vw, 44px);
+  letter-spacing: .06em;
   text-transform: uppercase;
-  text-shadow:
-    1px 0 rgba(255,60,120,.22),
-   -1px 0 rgba(60,220,255,.18);
+  opacity: .92;
 }
 
-.card-sub{
-  margin-top: 12px;
-  opacity: .82;
-  font-size: 18px;
-  line-height: 1.35;
-  color: rgba(233,238,252,.78);
-}
-
-.card-tag{
-  position:absolute;
-  left: 22px;
-  bottom: 16px;
+.ph-sub{
   font-size: 14px;
-  letter-spacing: .12em;
-  opacity:.55;
+  letter-spacing: .14em;
   text-transform: lowercase;
+  opacity: .55;
 }
 
-.card:hover{
-  transform: translateY(-2px);
-  box-shadow:
-    inset 0 0 0 1px rgba(0,255,190,.18),
-    0 26px 90px rgba(0,0,0,.55);
-  filter: saturate(1.08);
-}
-
-/* ----------------- CROWN (your approved format) ----------------- */
-/* crown button */
+/* ----------------- CROWN (boot behavior unchanged) ----------------- */
 .crown-btn{
   z-index: 3;
   border:0;
@@ -189,7 +237,6 @@ body.unlocked .site{
   gap: 14px;
 }
 
-/* crown svg */
 .crown{
   width: min(520px, 78vw);
   height:auto;
@@ -200,7 +247,6 @@ body.unlocked .site{
   will-change: transform, filter, opacity;
 }
 
-/* idle float */
 body:not(.entered) .crown{
   animation: idleFloat 2.8s ease-in-out infinite;
 }
@@ -209,48 +255,21 @@ body:not(.entered) .crown{
   50%{ transform: translateY(-10px); }
 }
 
-/* slam (STAYS ON SCREEN) */
 body.entered .crown-btn{ pointer-events:none; }
-
-.crown{
-  transform-origin: 50% 65%;
-}
-
-/* hide the “click the crown to begin” once we’ve entered */
-body.entered .boot-hint{
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 200ms ease, transform 200ms ease;
-}
 
 body.entered .crown{
   animation: slam 520ms cubic-bezier(.08,.95,.18,1) forwards;
 }
 
-/* Starts centered. Keep translateY <= ~40vh so it doesn’t clip off-screen */
 @keyframes slam{
   0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; filter: none; }
   48%  { transform: translateY(clamp(160px, 30vh, 320px)) rotate(-8deg) scale(1.06); opacity: .95; }
-  62%  { transform: translateY(clamp(190px, 34vh, 360px)) rotate(-10deg) scale(1.10, .84); opacity: .78; } /* impact squash */
-  78%  { transform: translateY(clamp(175px, 32vh, 340px)) rotate(-9deg)  scale(1.02, 1.02); opacity: .62; } /* rebound */
-  100% { transform: translateY(clamp(190px, 34vh, 360px)) rotate(-10deg) scale(.42); opacity: .14; filter: blur(2px) brightness(1.12); }
+  62%  { transform: translateY(clamp(190px, 34vh, 360px)) rotate(-10deg) scale(1.10, .84); opacity: .78; }
+  78%  { transform: translateY(clamp(175px, 32vh, 340px)) rotate(-9deg)  scale(1.02, 1.02); opacity: .62; }
+  100% { transform: translateY(320px) rotate(-10deg) scale(.42); opacity: .14; filter: blur(2px) brightness(1.12); }
 }
 
-
-
-/* tiny screen shake at impact */
-body.impact{
-  animation: shake 160ms steps(2,end) 1;
-}
-@keyframes shake{
-  0%{ transform: translate(0,0); }
-  25%{ transform: translate(2px,-2px); }
-  50%{ transform: translate(-2px,2px); }
-  75%{ transform: translate(2px,1px); }
-  100%{ transform: translate(0,0); }
-}
-
-/* click-to-begin only on first screen */
+/* click-to-begin */
 .cta{
   text-align:center;
   letter-spacing:.08em;
@@ -266,12 +285,10 @@ body.unlocked .cta{
   transform: translateY(8px);
 }
 
-body.entered .crown-btn{
-  pointer-events:none;
-}
-
 /* reduced motion */
 @media (prefers-reduced-motion: reduce){
   body:not(.entered) .crown{ animation:none; }
-  body.entered .crown{ animation:none; transform: translateY(60vh) scale(.42); opacity:.14; }
+  body.entered .crown{ animation:none; transform: translateY(68vh) scale(.42); opacity:.14; }
 }
+
+
