@@ -400,7 +400,7 @@ function enter(){
     });
   };
 
-  setTimeout(startDissolve, prefersReducedMotion ? 0 : 160);
+  setTimeout(startDissolve, prefersReducedMotion ? 0 : 80);
 }
 function bindMouseDeckScroll(){
   const rails = document.querySelectorAll("[data-deck]");
@@ -551,12 +551,6 @@ function bindIdentityCapHover(){
     row.addEventListener('mouseleave', clear);
   });
 }
-
-
-
-
-
-
 
 
 

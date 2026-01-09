@@ -269,6 +269,10 @@ body:not(.on-about) .crown-btn{
   place-items:center;
   gap: 14px;
 }
+body.unlocked.on-about .crown-btn{
+  z-index: 0; /* below .about-layout (z-index:1) */
+}
+
 
 .crown{
   width: min(520px, 78vw);
@@ -300,7 +304,7 @@ body.entered .crown{
   48%  { transform: translateY(clamp(160px, 30vh, 320px)) rotate(-8deg) scale(1.06); opacity: .95; }
   62%  { transform: translateY(clamp(190px, 34vh, 360px)) rotate(-10deg) scale(1.10, .84); opacity: .78; }
   78%  { transform: translateY(clamp(175px, 32vh, 340px)) rotate(-9deg)  scale(1.02, 1.02); opacity: .62; }
-  100% { transform: translateY(320px) rotate(-10deg) scale(.42); opacity: .14; }
+  100% { transform: translateY(400px) rotate(-10deg) scale(.42); opacity: .14; }
 }
 
 /* click-to-begin */
@@ -827,147 +831,4 @@ body.unlocked .cta{
 [data-panel="identity"] .work-row.has-active .work-note.is-active{
   opacity: 1;
   font-weight: 700;
-  transform: translateX(2px);
-  filter:
-    drop-shadow(0 0 10px rgba(0,255,190,.10))
-    drop-shadow(0 0 18px rgba(120,170,255,.12));
-}
-
-/* =========================
-   MUSIC CULTURE TAB
-   (same row logic as identity, different media shapes)
-   ========================= */
-
-/* single-item rows (one hero media) */
-[data-panel="music"] .thumb-row--single{
-  display:flex;
-  gap: 14px;
-  overflow: visible;
-}
-
-/* reset the generic fixed video height inside music */
-[data-panel="music"] .thumb-video{
-  width: 100%;
-  height: auto;
-  display:block;
-}
-
-/* Phone-ish prototype (VOOL) */
-[data-panel="music"] .thumb--phone{
-  width: clamp(240px, 28vw, 340px);
-}
-
-[data-panel="music"] .thumb-video--phone{
-  aspect-ratio: 9 / 16;
-  object-fit: contain;
-}
-
-/* Wide website demo (genre.exe) */
-[data-panel="music"] .thumb--wide{
-  width: min(900px, 100%);
-}
-
-[data-panel="music"] .thumb-video--wide{
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-}
-
-/* Edits grid (3 across, audio-on-click) */
-[data-panel="music"] .thumb-row--edits{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  overflow: visible;
-  padding-bottom: 0;
-}
-
-[data-panel="music"] .thumb--edit{
-  width: 100%;
-}
-
-[data-panel="music"] .thumb--edit .thumb-video{
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-}
-
-@media (max-width: 1100px){
-  [data-panel="music"] .thumb-row--edits{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (max-width: 700px){
-  [data-panel="music"] .thumb-row--single{ flex-direction: column; }
-  [data-panel="music"] .thumb--phone{ width: min(360px, 92vw); }
-  [data-panel="music"] .thumb-row--edits{ grid-template-columns: 1fr; }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  transform
