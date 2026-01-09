@@ -242,6 +242,7 @@ body:not(.on-about) .crown-btn{
   place-items:center;
   text-align:center;
   gap: 10px;
+  /* Shift placeholder images up and left */
 }
 
 .ph-title{
@@ -665,6 +666,20 @@ body.unlocked .cta{
   max-width: 36ch;
 }
 
+/* MUSIC CULTURE: don’t use the same huge media column as Identity */
+[data-panel="music"] .work-row{
+  grid-template-columns: minmax(420px, 1.15fr) minmax(360px, .85fr);
+  align-items: start;
+}
+
+/* tighten spacing + let text breathe a bit more */
+[data-panel="music"] .work-copy{ padding-top: 2px; }
+[data-panel="music"] .work-text{ max-width: 52ch; }
+
+[data-panel="music"] .work-row[data-work="vool"]{
+  align-items: stretch;
+  position: relative;
+}
 /* make media BIGGER */
 .thumb-row{
   margin-top: 0;
@@ -831,4 +846,235 @@ body.unlocked .cta{
 [data-panel="identity"] .work-row.has-active .work-note.is-active{
   opacity: 1;
   font-weight: 700;
-  transform
+  transform: translateX(2px);
+  filter:
+    drop-shadow(0 0 10px rgba(0,255,190,.10))
+    drop-shadow(0 0 18px rgba(120,170,255,.12));
+}
+
+/* =========================
+   MUSIC CULTURE TAB
+   (same row logic as identity, different media shapes)
+   ========================= */
+
+/* single-item rows (one hero media) */
+[data-panel="music"] .thumb-row--single{
+  display:flex;
+  gap: 14px;
+  overflow: visible;
+}
+
+/* reset the generic fixed video height inside music */
+[data-panel="music"] .thumb-video{
+  width: 100%;
+  height: auto;
+  display:block;
+}
+
+/* Phone-ish prototype (VOOL) — bigger + cropped so black margins shrink */
+[data-panel="music"] .thumb--phone{
+  width: clamp(360px, 34vw, 560px);
+  height: min(72vh, 760px);        /* makes the phone feel “tall” without killing the page */
+  border-radius: 28px;
+  overflow: hidden;                /* this is what allows the crop */
+  display: block;
+  position: relative;
+
+  /* optional: makes the phone pop without showing a “frame” */
+  box-shadow:
+    0 18px 60px rgba(0,0,0,.45),
+    0 0 0 1px rgba(233,238,252,.08);
+}
+
+/* Crop/zoom the video so the phone fills more of the box (cuts down black bg) */
+[data-panel="music"] .thumb-video--phone{
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  object-fit: cover;               /* KEY: zoom in, remove most black margin */
+  object-position: 50% 50%;
+
+  background: transparent;         /* avoids any extra “video element” background */
+  border-radius: inherit;
+}
+
+
+/* Wide website demo (genre.exe) */
+[data-panel="music"] .thumb--wide{
+  width: min(900px, 100%);
+}
+
+[data-panel="music"] .thumb-video--wide{
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+/* Edits grid (3 across, audio-on-click) */
+[data-panel="music"] .thumb-row--edits{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+[data-panel="music"] .thumb--edit{
+  width: 100%;
+}
+
+[data-panel="music"] .thumb--edit .thumb-video{
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+@media (max-width: 1100px){
+  [data-panel="music"] .thumb-row--edits{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px){
+  [data-panel="music"] .thumb-row--single{ flex-direction: column; }
+  [data-panel="music"] .thumb--phone{ width: min(360px, 92vw); }
+  [data-panel="music"] .thumb-row--edits{ grid-template-columns: 1fr; }
+}
+
+/* MUSIC CULTURE — stronger project descriptions */
+[data-panel="music"] .work-copy h3{
+  font-size: clamp(1.15rem, 1.4vw, 1.35rem);
+  letter-spacing: .08em;
+  margin-bottom: 12px;
+}
+
+[data-panel="music"] .work-copy p{
+  font-size: clamp(.95rem, 1.1vw, 1.05rem);
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Ensure text + placeholders stretch to match phone height */
+[data-panel="music"] .work-copy{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* VOOL placeholders — sit directly under the description text */
+[data-panel="music"] .vool-placeholders{
+  margin-top: 18px;               /* directly under text */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  max-width: 56ch;                /* keeps it aligned with your text width */
+}
+
+[data-panel="music"] .vool-ph{
+  height: 120px;
+  border-radius: 16px;
+  background: rgba(233,238,252,.03);
+  box-shadow: inset 0 0 0 1px rgba(233,238,252,.12);
+}
+
+/* VOOL process images — bigger + shifted left toward phone */
+/* VOOL process images — anchored to phone bottom, shifted left */
+[data-panel="music"] .vool-placeholders{
+  position: absolute;
+
+  /* align with phone bottom */
+  bottom: 32px; /* shift images up by 32px */
+
+  /* pull toward phone */
+  left: calc(50% - 260px);  /* 🔴 moves closer to phone */
+
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 18px;
+
+  max-width: none;
+  margin: 0;
+  padding-bottom: 6px;
+}
+
+
+[data-panel="music"] .vool-placeholders img{
+  max-height: clamp(280px, 32vh, 420px); /* big but natural */
+  width: auto;
+  height: auto;
+
+  object-fit: contain; /* no cropping */
+  border-radius: 0;
+  background: transparent;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
