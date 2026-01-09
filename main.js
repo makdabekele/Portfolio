@@ -358,6 +358,8 @@ function setActiveTab(name){
     btn.classList.toggle("is-active", isOn);
     btn.setAttribute("aria-selected", isOn ? "true" : "false");
   });
+  document.body.classList.toggle("on-about", name === "about");
+
 
   panels.forEach(p => {
     const isOn = p.dataset.panel === name;
@@ -503,6 +505,8 @@ panels.forEach(p => {
 
 
 window.addEventListener("DOMContentLoaded", init);
+document.body.classList.add("on-about");
+
 window.addEventListener("resize", () => {
   if (entered) return;
   fitFx();

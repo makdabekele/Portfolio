@@ -193,6 +193,20 @@ body.unlocked .site{
   filter:
     drop-shadow(0 10px 22px rgba(0,0,0,.45))
     drop-shadow(0 0 16px rgba(0,255,190,.08));
+  }
+
+  /* Hide mini-crown unless 'about' tab is active */
+  .panel:not(.is-active) ~ .about-intro .mini-crown {
+    display: none;
+  }
+  .panel.is-active[data-panel="about"] ~ .about-intro .mini-crown {
+    display: inline-block;
+  }
+
+/* Hide crown outside About tab */
+body:not(.on-about) .crown-btn{
+  opacity: 0;
+  pointer-events: none;
 }
 
 .about-intro{
