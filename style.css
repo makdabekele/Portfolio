@@ -371,7 +371,7 @@ body.unlocked .cta{
 }
 
 /* About page text block */
-.about-copy{
+[data-panel="about"] .about-copy{
   position: absolute;
   top: 34px;
   left: 34px;
@@ -497,22 +497,56 @@ body.unlocked .cta{
   scroll-snap-align:start;
 }
 
-.thumb img{
-  display:block;
-  width:100%;
-  height:240px;
-  object-fit:cover;
+/* Identity thumbs: BIG + NO CROP */
+[data-panel="identity"] .thumb{
+  width: 520px;          /* bigger than before */
+  position: relative;    /* for hover caption */
+  display: block;
 }
+
+[data-panel="identity"] .thumb img{
+  width: 100%;
+  height: auto;          /* key: no forced crop */
+  display: block;
+  object-fit: contain;   /* extra safety */
+}
+
+/* Hover caption (no outlines, just a soft label) */
+[data-panel="identity"] .thumb::after{
+  content: attr(data-cap);
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+
+  padding: 8px 10px;
+  border-radius: 12px;
+
+  background: rgba(5,8,16,.62);
+  color: rgba(233,238,252,.92);
+  font-size: 12px;
+  line-height: 1.35;
+
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  pointer-events: none;
+}
+
+[data-panel="identity"] .thumb:hover::after{
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
 /* Video thumb */
 .thumb--video{ width: 320px; }
-.thumb-video{
-  width:100%;
-  height:240px;
-  display:block;
-  object-fit:cover;
-  background:#000;
+[data-panel="identity"] .thumb-video{
+  width: 100%;
+  height: auto;
+  display: block;
 }
+
 
 .proj-note{
   margin-top: 10px;
@@ -521,14 +555,19 @@ body.unlocked .cta{
 }
 
 /* Nintendo deck rail (mouse-scroll) */
+/* Nintendo deck rail (manual scroll) */
 .deck-rail{
   margin-top: 12px;
   height: 260px;
   border-radius: 16px;
   background: rgba(5,8,16,.45);
   box-shadow: inset 0 0 0 1px rgba(233,238,252,.10);
-  overflow:hidden;
-  position:relative;
+
+  overflow-x: auto;   /* was overflow:hidden */
+  overflow-y: hidden; /* add */
+  -webkit-overflow-scrolling: touch; /* add */
+
+  position: relative;
 }
 
 .deck-track{
@@ -548,7 +587,7 @@ body.unlocked .cta{
     0 14px 40px rgba(0,0,0,.35);
   flex: 0 0 auto;
   user-select:none;
-  pointer-events:none; /* keeps mouse tracking smooth */
+  pointer-events:auto;
 }
 
 .deck-rail::after{
@@ -614,7 +653,7 @@ body.unlocked .cta{
   overflow: visible;     /* let the images breathe */
 }
 
-.thumb img{
+[data-panel]:not([data-panel="identity"]) .thumb img{
   width: 100%;
   height: 420px;         /* bigger */
   border-radius: 0;      /* no frame */
@@ -653,12 +692,125 @@ body.unlocked .cta{
   .work-row{
     grid-template-columns: 1fr;
   }
-  .thumb{ width: 78vw; }
-  .thumb img{ height: 52vw; }
+[data-panel="identity"] .thumb{ width: 92vw; }
+[data-panel="identity"] .thumb img{ height: auto; }
   .thumb--video{ width: 78vw; }
   .thumb-video{ height: 52vw; }
   .deck-rail{ height: 52vw; }
 }
+
+/* =========================
+   IDENTITY: 3-up, no scroll
+   ========================= */
+
+/* make the media column behave */
+[data-panel="identity"] .work-media { min-width: 0; }
+
+/* kill the horizontal scroller + snap */
+[data-panel="identity"] .thumb-row{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 across */
+  gap: 14px;
+  overflow: visible;
+  padding-bottom: 0;
+  scroll-snap-type: none;
+}
+
+/* thumbs should fill their grid cell (not fixed px) */
+[data-panel="identity"] .thumb{
+  width: 100%;
+  max-width: none;
+  display: block;
+  position: relative; /* for hover caption */
+}
+
+/* no crop */
+[data-panel="identity"] .thumb img{
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* your hover caption (uses data-cap) */
+[data-panel="identity"] .thumb::after{
+  content: attr(data-cap);
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(5,8,16,.62);
+  color: rgba(233,238,252,.92);
+  font-size: 12px;
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  pointer-events: none;
+}
+[data-panel="identity"] .thumb:hover::after{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* responsive: go 2-up, then 1-up */
+@media (max-width: 1100px){
+  [data-panel="identity"] .thumb-row{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px){
+  [data-panel="identity"] .thumb-row{
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-panel="identity"] .thumb::after{
+  content: attr(data-cap);
+  left: 10px;
+  bottom: 10px;
+  right: auto;
+  width: auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* === Identity: hover number -> highlight matching right note === */
+[data-panel="identity"] .work-notes{
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+[data-panel="identity"] .work-note{
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(233,238,252,.74);
+  opacity: .82;
+  transition: opacity 140ms ease, filter 140ms ease, transform 140ms ease, font-weight 140ms ease;
+}
+
+/* dim only the notes inside the hovered project */
+[data-panel="identity"] .work-row.has-active .work-note{
+  opacity: .28;
+}
+
+/* bold/glow the matching one */
+[data-panel="identity"] .work-row.has-active .work-note.is-active{
+  opacity: 1;
+  font-weight: 700;
+  transform: translateX(2px);
+  filter:
+    drop-shadow(0 0 10px rgba(0,255,190,.10))
+    drop-shadow(0 0 18px rgba(120,170,255,.12));
+}
+
 
 
 

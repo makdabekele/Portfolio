@@ -394,7 +394,7 @@ function enter(){
     dissolveHexCells(() => {
       document.body.classList.add("unlocked");
       setActiveTab("about");
-      scrambleReveal(heroTitle, "makda bekele", 520);
+      scrambleReveal(heroTitle, "makda bekele", 750);
     });
   };
 
@@ -438,17 +438,27 @@ function bindMouseDeckScroll(){
   track.style.transform = `translateX(${-current}px)`;
 }, { passive: false });
 
-    rail.addEventListener("mousemove", (e) => {
-      const rect = rail.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width; // 0..1
-      target = x * maxScroll();
-      if (!raf) raf = requestAnimationFrame(loop);
-    });
+    function bindMouseDeckScroll(){
+  const rails = document.querySelectorAll("[data-deck]");
+  rails.forEach(rail => {
+    const track = rail.querySelector(".deck-track");
+    if (!track) return;
 
-    rail.addEventListener("mouseleave", () => {
-      if (raf) cancelAnimationFrame(raf);
-      raf = null;
-    });
+    // native horizontal scrolling on the rail container
+    rail.style.overflowX = "auto";
+    rail.style.overflowY = "hidden";
+    rail.style.scrollBehavior = "smooth";
+
+    // Wheel: use vertical wheel to scroll horizontally (optional but nice)
+    rail.addEventListener("wheel", (e) => {
+      const canScroll = rail.scrollWidth > rail.clientWidth;
+      if (!canScroll) return;
+      e.preventDefault();
+      rail.scrollLeft += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY);
+    }, { passive: false });
+  });
+}
+
 
     window.addEventListener("resize", () => {
       const max = maxScroll();
@@ -488,6 +498,7 @@ panels.forEach(p => {
 
   document.body.classList.remove("entered","unlocked");
   entered = false;
+  bindIdentityCapHover();
 }
 
 
@@ -505,6 +516,37 @@ crownBtn.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") enter();
 });
 
+function bindIdentityCapHover(){
+  const panel = document.querySelector('[data-panel="identity"]');
+  if (!panel) return;
+
+  panel.querySelectorAll('.work-row').forEach(row => {
+    const notes = Array.from(row.querySelectorAll('.work-note[data-cap]'));
+    if (!notes.length) return;
+
+    const drivers = Array.from(row.querySelectorAll('.thumb[data-cap], .thumb-video[data-cap]'));
+    if (!drivers.length) return;
+
+    const setActive = (cap) => {
+      row.classList.add('has-active');
+      notes.forEach(n => n.classList.toggle('is-active', n.dataset.cap === cap));
+    };
+
+    const clear = () => {
+      row.classList.remove('has-active');
+      notes.forEach(n => n.classList.remove('is-active'));
+    };
+
+    drivers.forEach(el => {
+      el.addEventListener('mouseenter', () => setActive(el.dataset.cap));
+      el.addEventListener('focus', () => setActive(el.dataset.cap));
+      el.addEventListener('mouseleave', clear);
+      el.addEventListener('blur', clear);
+    });
+
+    row.addEventListener('mouseleave', clear);
+  });
+}
 
 
 
