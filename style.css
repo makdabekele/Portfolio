@@ -624,7 +624,7 @@ body.unlocked .cta{
 
 .work-row{
   display: grid;
-  grid-template-columns: minmax(520px, 1.35fr) minmax(260px, .85fr);
+  grid-template-columns: minmax(560px, 1.55fr) minmax(240px, .75fr);
   gap: 22px;
   align-items: start;
   padding: 14px 6px 22px;
