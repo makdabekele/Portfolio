@@ -559,9 +559,3 @@ function bindIdentityCapHover(){
 
 
 
-
-
-
-
-
-
