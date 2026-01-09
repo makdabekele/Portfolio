@@ -624,12 +624,11 @@ body.unlocked .cta{
 
 .work-row{
   display: grid;
-  grid-template-columns: minmax(560px, 1.55fr) minmax(240px, .75fr);
+  grid-template-columns: minmax(620px, 1.8fr) minmax(200px, .6fr);
   gap: 22px;
-  align-items: start;
-  padding: 14px 6px 22px;
-  border-bottom: 1px solid rgba(233,238,252,.10);
+    padding: 12px 6px 18px;
 }
+
 
 .work-row:last-child{ border-bottom: 0; }
 
@@ -650,7 +649,7 @@ body.unlocked .cta{
   font-size: 13px;
   line-height: 1.6;
   color: rgba(233,238,252,.74);
-  max-width: 42ch;
+  max-width: 36ch;
 }
 
 /* make media BIGGER */
@@ -825,40 +824,7 @@ body.unlocked .cta{
     drop-shadow(0 0 18px rgba(120,170,255,.12));
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* =========================
+   MUSIC CULTURE TAB
+   (same row logic as identity, different media shapes)
+  
