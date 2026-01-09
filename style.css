@@ -1,3 +1,4 @@
+
 :root{
   --bg0:#05070e;
   --bg1:#071020;
@@ -67,18 +68,16 @@ body.unlocked .site{
 .folder-shell{
   position:absolute;
   inset:0;
-
-  /* tighter than before */
-  padding: 10px 10px 12px;
-
+  padding: 0px;
   display:grid;
   place-items:start center;
 }
 
 .folder-tabs{
-  width: min(1320px, calc(100vw - 20px)); /* wider */
+  margin-top: 24px;
+  width: calc(100vw - 128px); /* match folder-body width for alignment */
   display:flex;
-  gap: 10px;
+    gap: 18px; /* increase gap for tab separation, matches screenshot */
   align-items:flex-end;
   justify-content:flex-start;
   position:relative;
@@ -94,13 +93,14 @@ body.unlocked .site{
   font-family: var(--mono);
 
   /* BIGGER LABELS */
-  font-size: 15px;
-  letter-spacing: .06em;
+
+  font-size: 20px;
+  letter-spacing: .08em;
   text-transform: uppercase;
 
   color: rgba(233,238,252,.78);
-  padding: 14px 18px 13px;
-  border-radius: 16px 16px 14px 14px;
+  padding: 22px 32px 19px;
+  border-radius: 22px 22px 18px 18px;
 
   background: rgba(5,8,16,.44);
   box-shadow:
@@ -120,7 +120,8 @@ body.unlocked .site{
   color: rgba(233,238,252,.98);
   background: rgba(5,8,16,.74);
 
-  transform: translateY(-3px) scale(1.06);
+  transform: translateY(-4px) scale(1.08);
+
 
   box-shadow:
     inset 0 0 0 1px rgba(120,170,255,.22),
@@ -130,17 +131,14 @@ body.unlocked .site{
 
 /* Folder body: more screen space */
 .folder-body{
-  width: min(1320px, calc(100vw - 20px));      /* wider */
-  height: calc(100vh - 78px);                   /* taller (tabs take less) */
-  margin-top: 10px;
-
-  border-radius: 22px;                          /* slightly tighter */
+  width: calc(100vw - 128px); /* 64px margin on each side, matches screenshot */
+  height: calc(100vh - 120px);
+  margin-top: 8px;
+  border-radius: 20px;
   background: rgba(5,8,16,.36);
   box-shadow:
     inset 0 0 0 1px rgba(233,238,252,.10),
     0 26px 105px rgba(0,0,0,.58);
-
-  /*backdrop-filter: blur(12px);*/
   overflow:hidden;
   position:relative;
 }
@@ -167,7 +165,7 @@ body.unlocked .site{
 .panel-inner{
   position:relative;
   height:100%;
-  padding: 14px; /* tighter */
+  padding: 8px;
 }
 .panel,
 .panel-inner{
@@ -338,7 +336,7 @@ body.unlocked .cta{
 }
 
 .about-photo{
-  width: clamp(260px, 32vw, 460px);
+  width: clamp(320px, 38vw, 560px);
   position: relative;
   filter: drop-shadow(0 22px 55px rgba(0,0,0,.55));
 }
@@ -347,7 +345,7 @@ body.unlocked .cta{
 .about-photo .shard{
   position:absolute;
   inset:0;
-  width:100%;
+  width: calc(100vw - 120px);
   height:auto;
   display:block;
 
@@ -387,29 +385,29 @@ body.unlocked .cta{
 /* About page text block */
 [data-panel="about"] .about-copy{
   position: absolute;
-  top: 34px;
-  left: 34px;
-  max-width: 520px;
+  top: 24px;
+  left: 24px;
+  max-width: 700px;
   z-index: 3;
 }
 
 .about-title{
   margin: 0 0 14px;
-  font-size: clamp(28px, 3.1vw, 44px);
+  font-size: clamp(36px, 4vw, 56px);
   line-height: 1.05;
   letter-spacing: .02em;
 }
 
 .about-text{
   margin: 0 0 12px;
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 21px;
+  line-height: 1.6;
   color: rgba(233,238,252,.88);
 }
 
 .about-text--muted{
   margin-top: 16px;
-  font-size: 13px;
+  font-size: 17px;
   color: rgba(233,238,252,.60);
 }
 
@@ -427,7 +425,7 @@ body.unlocked .cta{
 .panel-scroll{
   overflow:auto;
   height:100%;
-  padding: 18px;
+  padding: 12px;
 }
 
 .panel-head{ padding: 6px 6px 14px; }
@@ -632,6 +630,17 @@ body.unlocked .cta{
 
 .work-row:last-child{ border-bottom: 0; }
 
+.work-row{
+  border-bottom: 1px solid rgba(233,238,252,.08);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+.work-row:last-child{
+  border-bottom: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 .work-media{ min-width: 0; }
 .work-copy{
   padding-top: 6px;
@@ -827,4 +836,138 @@ body.unlocked .cta{
 /* =========================
    MUSIC CULTURE TAB
    (same row logic as identity, different media shapes)
-  
+   ========================= */
+
+/* single-item rows (one hero media) */
+[data-panel="music"] .thumb-row--single{
+  display:flex;
+  gap: 14px;
+  overflow: visible;
+}
+
+/* reset the generic fixed video height inside music */
+[data-panel="music"] .thumb-video{
+  width: 100%;
+  height: auto;
+  display:block;
+}
+
+/* Phone-ish prototype (VOOL) */
+[data-panel="music"] .thumb--phone{
+  width: clamp(240px, 28vw, 340px);
+}
+
+[data-panel="music"] .thumb-video--phone{
+  aspect-ratio: 9 / 16;
+  object-fit: contain;
+}
+
+/* Wide website demo (genre.exe) */
+[data-panel="music"] .thumb--wide{
+  width: min(900px, 100%);
+}
+
+[data-panel="music"] .thumb-video--wide{
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+/* Edits grid (3 across, audio-on-click) */
+[data-panel="music"] .thumb-row--edits{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+[data-panel="music"] .thumb--edit{
+  width: 100%;
+}
+
+[data-panel="music"] .thumb--edit .thumb-video{
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+@media (max-width: 1100px){
+  [data-panel="music"] .thumb-row--edits{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px){
+  [data-panel="music"] .thumb-row--single{ flex-direction: column; }
+  [data-panel="music"] .thumb--phone{ width: min(360px, 92vw); }
+  [data-panel="music"] .thumb-row--edits{ grid-template-columns: 1fr; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
