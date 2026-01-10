@@ -830,7 +830,7 @@ body.unlocked .cta{
 
 [data-panel="identity"] .work-note{
   margin: 0;
-  font-size: 13px;
+  font-size: 21px;
   line-height: 1.6;
   color: rgba(233,238,252,.74);
   opacity: .82;
@@ -1064,7 +1064,7 @@ body.unlocked .cta{
 /* right-side captions */
 [data-panel="music"] .edit-cap{
   margin: 0;
-  font-size: 13px;
+  font-size: 21px;
   line-height: 1.6;
   color: rgba(233,238,252,.74);
   max-width: 52ch;
@@ -1083,6 +1083,18 @@ body.unlocked .cta{
   [data-panel="music"] .edit-video{
     width: 100%;
   }
+}
+
+/* =========================================
+   GLOBAL: make right-column copy bigger
+   (match Music Culture VOOL/genre scale)
+   ========================================= */
+
+/* project titles on the right */
+.work-title{
+  font-size: clamp(1.15rem, 1.4vw, 1.35rem);
+  letter-spacing: .08em;
+  margin-bottom: 12px;
 }
 
 
