@@ -1031,6 +1031,60 @@ body.unlocked .cta{
   background: transparent;
 }
 
+/* =========================
+   MUSIC — EDITS (LEFT VIDEOS, RIGHT CAPTIONS)
+   ========================= */
+
+[data-panel="music"] .edits-grid{
+  display: grid;
+  grid-template-columns: minmax(560px, 1.5fr) minmax(280px, .65fr);
+  column-gap: 22px;
+  row-gap: 22px;              /* controls space between edits */
+  align-items: start;
+}
+
+/* video container */
+[data-panel="music"] .edit-video{
+  width: min(100%, 980px);
+  aspect-ratio: 21 / 9;
+  overflow: hidden;
+  position: relative;
+}
+
+/* actual video */
+[data-panel="music"] .edit-video-el{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;          /* crops out black bars */
+  object-position: 50% 50%;
+  background: transparent;
+}
+
+/* right-side captions */
+[data-panel="music"] .edit-cap{
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(233,238,252,.74);
+  max-width: 52ch;
+}
+
+/* first right cell contains title + caption */
+[data-panel="music"] .edit-copy--first .work-title{
+  margin: 0 0 10px;
+}
+
+/* mobile: stack each pair */
+@media (max-width: 980px){
+  [data-panel="music"] .edits-grid{
+    grid-template-columns: 1fr;
+  }
+  [data-panel="music"] .edit-video{
+    width: 100%;
+  }
+}
+
 
 
 
