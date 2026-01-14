@@ -179,21 +179,28 @@ body.unlocked .site{
   gap: 14px;
 }
 
-.mini-crown{
-  height: 34px;
-  width: auto;
-  opacity: .85;
-  flex: 0 0 auto;
 
-  /* tiny nudge so it visually sits on the same baseline */
-  transform: translateY(2px);
+.mini-btn {
+  display: inline-block;
+  padding: 0.5em 1.2em;
+  font-size: 1em;
+  font-weight: 600;
+  border-radius: 2em;
+  background: #e9eefc;
+  color: #1a1a1a;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
 
-  filter:
-    drop-shadow(0 10px 22px rgba(0,0,0,.45))
-    drop-shadow(0 0 16px rgba(0,255,190,.08));
-  }
-
-  /* Hide mini-crown unless 'about' tab is active */
+.genre-btn-big {
+  font-size: 1.5em;
+  padding: 0.8em 2.5em;
+  border-radius: 2.5em;
+}
   .panel:not(.is-active) ~ .about-intro .mini-crown {
     display: none;
   }
@@ -1094,84 +1101,4 @@ body.unlocked .cta{
 .work-title{
   font-size: clamp(1.15rem, 1.4vw, 1.35rem);
   letter-spacing: .08em;
-  margin-bottom: 12px;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  m
