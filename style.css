@@ -747,6 +747,7 @@ body.unlocked .cta{
   .deck-rail{ height: 52vw; }
 }
 
+
 /* =========================
    IDENTITY: 3-up, no scroll
    ========================= */
@@ -770,6 +771,7 @@ body.unlocked .cta{
   max-width: none;
   display: block;
   position: relative; /* for hover caption */
+  transition: opacity 180ms;
 }
 
 /* no crop */
@@ -778,6 +780,7 @@ body.unlocked .cta{
   height: auto;
   display: block;
   object-fit: contain;
+  transition: opacity 180ms;
 }
 
 /* your hover caption (uses data-cap) */
@@ -801,6 +804,35 @@ body.unlocked .cta{
 [data-panel="identity"] .thumb:hover::after{
   opacity: 1;
   transform: translateY(0);
+}
+
+/* GREYOUT EFFECT: Only on Identity panel, non-hovered thumbs and work-copy are muted */
+
+/* Only slightly grey out non-hovered images, not text, on Identity panel */
+[data-panel="identity"] .thumb-row:hover .thumb:not(:hover) {
+  opacity: 0.72;
+  filter: grayscale(0.25);
+}
+[data-panel="identity"] .thumb-row:hover .thumb:not(:hover) img {
+  opacity: 0.72;
+  filter: grayscale(0.25);
+}
+
+/* Do not grey out text for non-hovered works */
+[data-panel="identity"] .work-row .work-copy {
+  opacity: 1;
+  color: inherit;
+  filter: none;
+  transition: none;
+}
+
+/* Remove any global hover greyout for other panels */
+[data-panel]:not([data-panel="identity"]) .thumb-row .thumb,
+[data-panel]:not([data-panel="identity"]) .thumb-row .thumb img,
+[data-panel]:not([data-panel="identity"]) .work-row .work-copy {
+  opacity: 1 !important;
+  filter: none !important;
+  color: inherit !important;
 }
 
 /* responsive: go 2-up, then 1-up */
