@@ -20,7 +20,7 @@
   align-items: flex-start;
 }
 .contact-box {
-  width: 420px;
+  width: 600px;
   height: 48px;
   background: rgba(233,238,252,0.13);
   border-radius: 12px;
@@ -38,7 +38,7 @@
 }
 .contact-box a {
   color: var(--fg);
-  text-decoration: none;
+  text-decoration: underline;  /* ← Always underline */
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
