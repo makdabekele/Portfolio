@@ -20,7 +20,8 @@
   align-items: flex-start;
 }
 .contact-box {
-  width: 600px;
+  width: 100%;
+  max-width: 420px;
   height: 48px;
   background: rgba(233,238,252,0.13);
   border-radius: 12px;
@@ -406,10 +407,10 @@ body.unlocked .cta{
 .about-photo .shard{
   position:absolute;
   inset:0;
-  width: calc(100vw - 120px);
+  width: 100%;
   height:auto;
   display:block;
-
+  
   opacity: 0;
   visibility: hidden;
   transform: translateY(18px) scale(.98);
@@ -1184,6 +1185,38 @@ body.unlocked .cta{
   letter-spacing: .08em;
   margin-bottom: 12px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
